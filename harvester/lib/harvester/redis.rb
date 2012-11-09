@@ -7,6 +7,10 @@ require "resque"
 
 module Harvester
 
+  class HarvesterLogs
+    @queue = :logs_harvester
+  end
+
   class Barn
 
     def initialize(args)
@@ -23,6 +27,16 @@ module Harvester
 
       # Connect to Redis
       @redis = Redis.new(redis_args)
+
+    end
+
+    def log_run(harvester_uuid, crop_number, began_at, ended_at, source_count, change_count, add_count, delete_count)
+
+      begin
+        Resque.enqueue(HarvesterLogs, Time.now, harvester_uuid, crop_number, began_at, ended_at, source_count, change_count, add_count, delete_count)
+      rescue Exception => e
+        logger.fatal "#{self.class} Fail in Resque.enqueue of HarvesterLogs. #{e.backtrace}"
+      end
 
     end
 

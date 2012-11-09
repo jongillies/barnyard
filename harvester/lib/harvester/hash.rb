@@ -24,6 +24,13 @@ module Harvester
       end
     end
 
+    def log_run(harvester_uuid, crop_number, began_at, ended_at, source_count, change_count, add_count, delete_count)
+
+      puts "#{harvester_uuid}, #{crop_number}, #{began_at}, #{ended_at}, #{source_count}, #{change_count}, #{add_count}, #{delete_count})
+"
+    end
+
+
     def delete(primary_key)
       check_key primary_key
       object = Crack::JSON.parse(@barn[primary_key])

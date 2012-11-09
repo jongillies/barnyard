@@ -139,10 +139,14 @@ module Harvester
 
     def run
 
+      @began_at = Time.now
+
       yield
 
       # Detect and queue Deletes
       delete_run
+
+      @ended_at = Time.now
 
       # Let Farmer know I'm done and to flush the updates
       @my_barn.flush
@@ -150,11 +154,15 @@ module Harvester
       @my_change_queue.flush
       @my_delete_queue.flush
 
+      @my_barn.log_run(@harvester_uuid, @crop_number, @began_at, @ended_at, @source_count, @change_count, @add_count, @delete_count)
+
     end
 
-    def empty!
-      @my_barn.empty!
-    end
+
+  end
+
+  def empty!
+    @my_barn.empty!
   end
 end
 
