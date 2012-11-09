@@ -3,7 +3,6 @@ require "logger"
 
 require "harvester/version"
 
-
 module Harvester
   ADD = "add"
   CHANGE = "change"
@@ -164,45 +163,4 @@ module Harvester
   def empty!
     @my_barn.empty!
   end
-end
-
-if __FILE__ == $0
-
-  require 'logger'
-  require "yaml"
-
-  @data = YAML::load_file("test.yml")
-
-  my_log = Logger.new(STDOUT)
-  my_log.level = Logger::WARN
-
-  redis_settings = {
-      :host => "localhost",
-      :port => 6379,
-  }
-
-
-  # Get a connection to your data source
-  # (For this example we will use a YAML file)
-
-  @data = YAML::load_file("test.yml")
-
-  h = Harvester::Sync.new(:debug => false, :crop_number => 1,
-                          :logger => my_log,
-  #:backend => :hash
-  )
-
-  h.run do
-
-    # Iterate your data here and call #process with the primary key and the value
-    @data.each do |primary_key, value|
-      my_log.info "PK: #{primary_key}"
-      h.process primary_key, value
-    end
-
-  end
-
-  puts h.stats
-
-
 end

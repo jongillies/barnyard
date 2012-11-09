@@ -82,34 +82,3 @@ module Harvester
 
 
 end
-
-if __FILE__ == $0
-
-  b = APOL_Harvester::Barn.new(:crop_number => 1)
-
-  #b["1"] = "jon"
-
-  #puts b["1"]
-
-  b.each do |primary_key, value|
-    puts "#{primary_key}=#{value}"
-  end
-
-  b["aa"] = "test"
-
-  b.each do |primary_key, value|
-    puts "#{primary_key}=#{value}"
-  end
-
-  b.flush
-
-  #puts b
-
-  #q = APOL_Harvester::AddQueue.new "random_string"
-  #
-  #q["1"] = "nick"
-  #q[:steve] = "jon"
-  #
-  #puts q
-
-end

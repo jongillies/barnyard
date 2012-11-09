@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 require "redis"
 require "crack"
 require "json"
