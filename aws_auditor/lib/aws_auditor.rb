@@ -46,7 +46,7 @@ module AwsAuditor
             compute = Fog::AWS::IAM.new({
                                             :aws_access_key_id => @aws_access_key_id,
                                             :aws_secret_access_key => @aws_secret_access_key,
-                                            :region => @region
+                                            #:region => @region
                                         })
           else
             compute = Fog::Compute.new({
@@ -61,11 +61,13 @@ module AwsAuditor
           when "AwsAuditor::AwsSecurityGroups"
             compute.security_groups.each do |security_group|
               unless security_group.group_id.nil?
-                @log.info "#{@region}:#{@account_id}: #{security_group.group_id}"
                 obj = Crack::JSON.parse security_group.to_json
                 obj["account_id"] = @account_id
 
-                @synchronizer.process make_primary_key(@account_id, security_group.group_id), obj
+                primary_key = make_primary_key(@account_id, security_group.group_id)
+                @log.info "#{primary_key}"
+
+                @synchronizer.process primary_key, obj
 
               end
             end
@@ -73,14 +75,13 @@ module AwsAuditor
           when "AwsAuditor::AwsInstances"
             compute.servers.each do |s|
               unless s.id.nil?
-                @log.info "#{@region}:``#{@account_id}: #{s.id}"
-
-                # add the @account_id to the hash and also associated burrito record if it exists
                 obj = Crack::JSON.parse s.to_json
                 obj["account_id"] = @account_id
-                obj["burrito"] = @burrito["instances"].find_one("native_id" => s.id)
 
-                @synchronizer.process make_primary_key(@account_id, s.id), obj
+                primary_key = make_primary_key(@account_id, s.id)
+                @log.info "#{primary_key}"
+
+                @synchronizer.process primary_key, obj
 
               end
             end
@@ -88,11 +89,13 @@ module AwsAuditor
           when "AwsAuditor::AwsSnapshots"
             compute.snapshots.each do |snapshot|
               unless snapshot.id.nil?
-                @log.info "#{@region}:#{@account_id}: #{snapshot.id}"
                 obj = Crack::JSON.parse snapshot.to_json
                 obj["account_id"] = @account_id
 
-                @synchronizer.process make_primary_key(@account_id, snapshot.id), obj
+                primary_key = make_primary_key(@account_id, snapshot.id)
+                @log.info "#{primary_key}"
+
+                @synchronizer.process primary_key, obj
 
               end
             end
@@ -100,21 +103,27 @@ module AwsAuditor
           when "AwsAuditor::AwsVolumes"
             compute.volumes.each do |s|
               unless s.id.nil?
-                @log.info "#{@region}:#{@account_id} #{s.id}"
                 obj = Crack::JSON.parse s.to_json
                 obj["account_id"] = @account_id
-                @synchronizer.process make_primary_key(@account_id, s.id), obj
+
+                primary_key = make_primary_key(@account_id, s.id)
+                @log.info "#{primary_key}"
+
+                @synchronizer.process primary_key, obj
+
               end
             end
 
           when "AwsAuditor::AwsSubnets"
             compute.subnets.each do |s|
               unless s.subnet_id.nil?
-                @log.info "#{@region}:#{@account_id}: #{s.subnet_id}"
                 obj = Crack::JSON.parse s.to_json
                 obj["account_id"] = @account_id
 
-                @synchronizer.process make_primary_key(@account_id, s.subnet_id), obj
+                primary_key = make_primary_key(@account_id, s.subnet_id)
+                @log.info "#{primary_key}"
+
+                @synchronizer.process primary_key, obj
 
               end
             end
@@ -122,30 +131,34 @@ module AwsAuditor
           when "AwsAuditor::AwsElbs"
             compute.load_balancers.each do |elb|
               unless elb.dns_name.nil?
-                @log.info "#{@region}:#{@account_id}: #{elb.dns_name}"
                 obj = Crack::JSON.parse elb.to_json
                 obj["account_id"] = @account_id
 
-                @synchronizer.process make_primary_key(@account_id, elb.dns_name), obj
+                primary_key = make_primary_key(@account_id, elb.dns_name)
+                @log.info "#{primary_key}"
+
+                @synchronizer.process primary_key, obj
+
               end
             end
 
           when "AwsAuditor::AwsIamUsers"
-            next unless region == "us-west-1" # You only need to parse 1 region to get the IAM users
             compute.list_users.body["Users"].each do |user|
               unless user['UserId'].nil?
-                @log.info "#{@region}:#{@account_id}: #{user['UserID']}"
                 access_keys = compute.list_access_keys({'UserName' => user['UserName']}).body["AccessKeys"]
                 obj = Crack::JSON.parse user.to_json
                 obj["account_id"] = @account_id
                 obj["access_keys"] = access_keys
 
-                @synchronizer.process make_primary_key(@account_id, user['UserId']), obj
+                primary_key = make_primary_key(@account_id, user['UserId'])
+                @log.info "#{primary_key}"
+
+                @synchronizer.process primary_key, obj
+
               end
             end
 
           when "AwsAuditor::AwsIamGroupPolicies"
-            next unless region == "us-west-1" # You only need to parse 1 region to get the IAM users
 
             obj = Hash.new
             obj["account_id"] = @account_id
@@ -162,15 +175,16 @@ module AwsAuditor
 
                   obj["policies"] << policy_obj
 
-                  @log.info "#{@region}:#{@account_id}: #{group["GroupName"]}:#{policy}"
-
                 rescue Exception => e
                   @log.warn "Unable to Crack policy >#{compute.get_group_policy(policy, group["GroupName"]).body["PolicyDocument"]}<"
                 end
 
               end
 
-              @synchronizer.process make_primary_key(@account_id, group["GroupId"]), obj
+              primary_key = make_primary_key(@account_id, group["GroupId"])
+              @log.info "#{primary_key}"
+
+              @synchronizer.process primary_key, obj
 
             end
 
