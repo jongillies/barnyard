@@ -78,16 +78,6 @@ module Harvester
     def flush
     end
 
-    #def empty!
-    #  puts ">>> Redis Keys: #{@redis.keys}"
-    #  @redis.keys.each do |key|
-    #    @redis.del(key)
-    #  end
-    #  puts "<<< Redis Keys: #{@redis.keys}"
-    #
-    #
-    #end
-
     private
 
     def check_key(primary_key)

@@ -157,10 +157,6 @@ module Harvester
 
     end
 
-
   end
 
-  def empty!
-    @my_barn.empty!
-  end
 end
