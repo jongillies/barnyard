@@ -1,0 +1,6 @@
+*.gem
+*.idea
+.bundle
+Gemfile.lock
+pkg/*
+1-BarnyardHarvester::*
