@@ -1,4 +1,4 @@
-module Harvester
+module BarnyardHarvester
 
   class ChangeLogs
     @queue = :logs_change

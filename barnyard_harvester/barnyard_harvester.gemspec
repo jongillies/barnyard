@@ -1,10 +1,10 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path("../lib", __FILE__)
-require "harvester/version"
+require "barnyard_harvester/version"
 
 Gem::Specification.new do |s|
-  s.name        = "harvester"
-  s.version     = Harvester::VERSION
+  s.name        = "barnyard_harvester"
+  s.version     = BarnyardHarvester::VERSION
   s.authors     = ["Jon Gillies"]
   s.email       = ["supercoder@gmail.com"]
   s.homepage    = ""

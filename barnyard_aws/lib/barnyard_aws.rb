@@ -1,10 +1,10 @@
 require "fog"
-require "harvester"
+require "barnyard_harvester"
 require "json"
 
-require "aws_auditor/version"
+require "barnyard_aws/version"
 
-module AwsAuditor
+module BarnyardAws
 
   class AwsObject
 
@@ -26,23 +26,22 @@ module AwsAuditor
       @region = args.fetch(:region) { raise "You must provide :region" }
       @account_id = args.fetch(:account_id) { raise "You must provide :account_id" }
 
-#      @log.debug JSON.pretty_generate(args)
-      puts JSON.pretty_generate(args)
+      @log.debug JSON.pretty_generate(args)
       @log.debug "region=#{@region}"
 
-      @synchronizer = Harvester::Sync.new(args)
+      @synchronizer = BarnyardHarvester::Sync.new(args)
 
       @synchronizer.run do
 
         case self.class.to_s
-          when "AwsAuditor::AwsElbs"
+          when "BarnyardAws::AwsElbs"
             compute = Fog::AWS::ELB.new({
                                             :aws_access_key_id => @aws_access_key_id,
                                             :aws_secret_access_key => @aws_secret_access_key,
                                             :region => @region
                                         })
-          when "AwsAuditor::AwsIamUsers",
-              "AwsAuditor::AwsIamGroupPolicies"
+          when "BarnyardAws::AwsIamUsers",
+              "BarnyardAws::AwsIamGroupPolicies"
             compute = Fog::AWS::IAM.new({
                                             :aws_access_key_id => @aws_access_key_id,
                                             :aws_secret_access_key => @aws_secret_access_key,
@@ -58,7 +57,7 @@ module AwsAuditor
         end
 
         case self.class.to_s
-          when "AwsAuditor::AwsSecurityGroups"
+          when "BarnyardAws::AwsSecurityGroups"
             compute.security_groups.each do |security_group|
               unless security_group.group_id.nil?
                 obj = Crack::JSON.parse security_group.to_json
@@ -72,7 +71,7 @@ module AwsAuditor
               end
             end
 
-          when "AwsAuditor::AwsInstances"
+          when "BarnyardAws::AwsInstances"
             compute.servers.each do |s|
               unless s.id.nil?
                 obj = Crack::JSON.parse s.to_json
@@ -86,7 +85,7 @@ module AwsAuditor
               end
             end
 
-          when "AwsAuditor::AwsSnapshots"
+          when "BarnyardAws::AwsSnapshots"
             compute.snapshots.each do |snapshot|
               unless snapshot.id.nil?
                 obj = Crack::JSON.parse snapshot.to_json
@@ -100,7 +99,7 @@ module AwsAuditor
               end
             end
 
-          when "AwsAuditor::AwsVolumes"
+          when "BarnyardAws::AwsVolumes"
             compute.volumes.each do |s|
               unless s.id.nil?
                 obj = Crack::JSON.parse s.to_json
@@ -114,7 +113,7 @@ module AwsAuditor
               end
             end
 
-          when "AwsAuditor::AwsSubnets"
+          when "BarnyardAws::AwsSubnets"
             compute.subnets.each do |s|
               unless s.subnet_id.nil?
                 obj = Crack::JSON.parse s.to_json
@@ -128,7 +127,7 @@ module AwsAuditor
               end
             end
 
-          when "AwsAuditor::AwsElbs"
+          when "BarnyardAws::AwsElbs"
             compute.load_balancers.each do |elb|
               unless elb.dns_name.nil?
                 obj = Crack::JSON.parse elb.to_json
@@ -142,7 +141,7 @@ module AwsAuditor
               end
             end
 
-          when "AwsAuditor::AwsIamUsers"
+          when "BarnyardAws::AwsIamUsers"
             compute.list_users.body["Users"].each do |user|
               unless user['UserId'].nil?
                 access_keys = compute.list_access_keys({'UserName' => user['UserName']}).body["AccessKeys"]
@@ -158,7 +157,7 @@ module AwsAuditor
               end
             end
 
-          when "AwsAuditor::AwsIamGroupPolicies"
+          when "BarnyardAws::AwsIamGroupPolicies"
 
             obj = Hash.new
             obj["account_id"] = @account_id

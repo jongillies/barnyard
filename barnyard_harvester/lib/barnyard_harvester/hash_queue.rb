@@ -1,4 +1,4 @@
-module Harvester
+module BarnyardHarvester
   class Queue
 
     def initialize(args)
@@ -18,7 +18,7 @@ module Harvester
 
       @queue[primary_key] = value.to_json
 
-      puts "HashQueue: Now: #{DateTime.now}, Harvester:#{harvester_uuid}, Change:#{crop_change_uuid} crop_number: #{crop_number}, key: #{primary_key}, transaction_type: #{transaction_type})"
+      @log.debug "HashQueue: Now: #{DateTime.now}, Harvester:#{harvester_uuid}, Change:#{crop_change_uuid} crop_number: #{crop_number}, key: #{primary_key}, transaction_type: #{transaction_type})"
 
     end
 

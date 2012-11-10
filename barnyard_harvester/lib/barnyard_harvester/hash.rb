@@ -3,7 +3,7 @@
 require 'crack'
 require 'json'
 
-module Harvester
+module BarnyardHarvester
 
   class Barn
 
@@ -25,7 +25,7 @@ module Harvester
     end
 
     def log_run(harvester_uuid, crop_number, began_at, ended_at, source_count, change_count, add_count, delete_count)
-      puts "HARVESTER_LOG #{harvester_uuid}, #{crop_number}, #{began_at}, #{ended_at}, #{source_count}, #{change_count}, #{add_count}, #{delete_count})"
+      @log.debug "HARVESTER_LOG #{harvester_uuid}, #{crop_number}, #{began_at}, #{ended_at}, #{source_count}, #{change_count}, #{add_count}, #{delete_count})"
     end
 
     def delete(primary_key)

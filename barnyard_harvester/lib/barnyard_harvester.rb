@@ -1,9 +1,9 @@
 require "uuid"
 require "logger"
 
-require "harvester/version"
+require "barnyard_harvester/version"
 
-module Harvester
+module BarnyardHarvester
   ADD = "add"
   CHANGE = "change"
   DELETE = "delete"
@@ -38,8 +38,8 @@ module Harvester
 
       @backend = args.fetch(:backend) { :redis }
 
-      require "harvester/#{@backend.to_s}_queue"
-      require "harvester/#{@backend.to_s}"
+      require "barnyard_harvester/#{@backend.to_s}_queue"
+      require "barnyard_harvester/#{@backend.to_s}"
 
 #      YAML::ENGINE.yamler = 'syck'
 
@@ -49,10 +49,10 @@ module Harvester
       @key_store = Hash.new
 
       # Setup barn and queues
-      @my_barn = Harvester::Barn.new args
-      @my_add_queue = Harvester::AddQueue.new args
-      @my_change_queue = Harvester::ChangeQueue.new args
-      @my_delete_queue = Harvester::DeleteQueue.new args
+      @my_barn = BarnyardHarvester::Barn.new args
+      @my_add_queue = BarnyardHarvester::AddQueue.new args
+      @my_change_queue = BarnyardHarvester::ChangeQueue.new args
+      @my_delete_queue = BarnyardHarvester::DeleteQueue.new args
 
       @add_count = @change_count = @delete_count = @source_count = @cache_count = 0
 
@@ -72,7 +72,7 @@ module Harvester
         # We got delete
         begin
           crop_change_uuid = @uuid.generate
-          @my_delete_queue.push @harvester_uuid, crop_change_uuid, @crop_number, primary_key, Harvester::DELETE, value
+          @my_delete_queue.push @harvester_uuid, crop_change_uuid, @crop_number, primary_key, BarnyardHarvester::DELETE, value
         rescue Exception => e
           @log.fatal "FATAL error pushing delete #{primary_key} to queue. #{e}"
           exit 1
@@ -109,7 +109,7 @@ module Harvester
         if @my_barn[primary_key] != Crack::JSON.parse(value.to_json)
           #We got change!
           begin
-            @my_change_queue.push(@harvester_uuid, crop_change_uuid, @crop_number, primary_key, Harvester::CHANGE, value, @my_barn[primary_key])
+            @my_change_queue.push(@harvester_uuid, crop_change_uuid, @crop_number, primary_key, BarnyardHarvester::CHANGE, value, @my_barn[primary_key])
           rescue Exception => e
             @log.fatal "FATAL error pushing change #{primary_key} to queue. #{e}"
             exit 1
@@ -121,7 +121,7 @@ module Harvester
       else
         # We got add!
         begin
-          @my_add_queue.push(@harvester_uuid, crop_change_uuid, @crop_number, primary_key, Harvester::ADD, value)
+          @my_add_queue.push(@harvester_uuid, crop_change_uuid, @crop_number, primary_key, BarnyardHarvester::ADD, value)
         rescue Exception => e
           @log.fatal "FATAL error pushing add #{primary_key} to queue. #{e}"
           exit 1

@@ -1,7 +1,7 @@
-require "aws_auditor"
+require "barnyard_aws"
 require "logger"
 
-describe AwsAuditor do
+describe BarnyardAws do
 
   AWS_SECRET_ACCESS_KEY=ENV["AWS_SECRET_ACCESS_KEY"]
   AWS_ACCESS_KEY_ID=ENV["AWS_ACCESS_KEY_ID"]
@@ -16,10 +16,10 @@ describe AwsAuditor do
         :port => 6379,
     }
 
-    [AwsAuditor::AwsElbs, AwsAuditor::AwsSecurityGroups,
-     AwsAuditor::AwsInstances, AwsAuditor::AwsSnapshots,
-     AwsAuditor::AwsVolumes, AwsAuditor::AwsSubnets,
-     AwsAuditor::AwsIamUsers, AwsAuditor::AwsIamGroupPolicies].each do |o|
+    [BarnyardAws::AwsElbs, BarnyardAws::AwsSecurityGroups,
+     BarnyardAws::AwsInstances, BarnyardAws::AwsSnapshots,
+     BarnyardAws::AwsVolumes, BarnyardAws::AwsSubnets,
+     BarnyardAws::AwsIamUsers, BarnyardAws::AwsIamGroupPolicies].each do |o|
 
       o.new(aws_access_key_id: AWS_ACCESS_KEY_ID,
             aws_secret_access_key: AWS_SECRET_ACCESS_KEY,

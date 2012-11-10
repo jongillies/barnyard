@@ -1,4 +1,4 @@
-require "harvester"
+require "barnyard_harvester"
 require "yaml"
 require "redis"
 require "logger"
@@ -7,7 +7,7 @@ require "json"
 
 # TODO.. Move the flush to the backend object, not here!!!!!!!!!
 
-describe Harvester do
+describe BarnyardHarvester do
 
 
   def load_and_process_file(file, backend)
@@ -22,7 +22,7 @@ describe Harvester do
     my_logger = Logger.new(STDOUT)
     my_logger.level = Logger::INFO
 
-    h = Harvester::Sync.new(:backend => backend, :debug => false, :crop_number => 1, :redis_settings => redis_settings, :logger => my_logger)
+    h = BarnyardHarvester::Sync.new(:backend => backend, :debug => false, :crop_number => 1, :redis_settings => redis_settings, :logger => my_logger)
 
     h.run do
       data.each do |primary_key, value|

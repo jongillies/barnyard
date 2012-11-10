@@ -3,7 +3,7 @@ require "crack"
 require "json"
 require "resque"
 
-module Harvester
+module BarnyardHarvester
 
   class HarvesterLogs
     @queue = :logs_harvester
