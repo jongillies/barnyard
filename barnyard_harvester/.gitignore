@@ -1,6 +1,1 @@
-*.gem
-*.idea
-.bundle
-Gemfile.lock
-pkg/*
-1-Harvester::*
+../.gitignore
