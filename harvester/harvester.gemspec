@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.email       = ["supercoder@gmail.com"]
   s.homepage    = ""
   s.summary     = %q{Performs Harvests}
-  s.description = %q{Performs Harvests}
+  s.description = %q{Performs Harvests really well}
 
   s.rubyforge_project = "harvester"
 
@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   # specify any dependencies here; for example:
-  # s.add_development_dependency "rspec"
+  s.add_development_dependency "rspec"
   s.add_runtime_dependency "resque"
   s.add_runtime_dependency "crack"
   s.add_runtime_dependency "json"

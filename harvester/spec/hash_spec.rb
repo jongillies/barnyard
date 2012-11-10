@@ -35,7 +35,7 @@ describe Harvester do
 
   def flush(crop_number)
 
-    File.delete("#{crop_number}-Harvester::Barn.yml")
+    File.delete("#{crop_number}-Harvester::Barn.yml") if File.exist? "#{crop_number}-Harvester::Barn.yml"
 
   end
 
