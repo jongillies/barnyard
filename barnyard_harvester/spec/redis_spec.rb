@@ -4,9 +4,6 @@ require "redis"
 require "logger"
 require "json"
 
-
-# TODO.. Move the flush to the backend object, not here!!!!!!!!!
-
 CROP_NUMBER = 1
 
 REDIS_SETTINGS = {
@@ -16,7 +13,6 @@ REDIS_SETTINGS = {
 }
 
 describe BarnyardHarvester do
-
 
   def load_and_process_file(file, backend)
 

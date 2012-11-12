@@ -11,7 +11,7 @@ describe BarnyardAws do
     my_logger = Logger.new(STDOUT)
     my_logger.level = Logger::INFO
 
-    redis_settings = {
+    REDIS_SETTINGS = {
         :host => "localhost",
         :port => 6379
     }
@@ -27,7 +27,7 @@ describe BarnyardAws do
             account_id: "dev",
             crop_number: 1,
             logger: my_logger,
-            redis_settings: redis_settings,
+            redis_settings: REDIS_SETTINGS,
             debug: true)
 
     end
