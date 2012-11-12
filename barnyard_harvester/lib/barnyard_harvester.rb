@@ -8,17 +8,6 @@ module BarnyardHarvester
   CHANGE = "change"
   DELETE = "delete"
 
-  # Available Options:
-  #
-  # :crop_number (required)
-  # :debug true/1
-  # :resque_enqueue true/1 (Goes to Farmer queue)
-  #
-  # :logger_call_back (calls this function with a load of params)
-  # :data_call_back (I totally forgot what this was for)
-  # :backend (default is :redis, available are: :hash, :mongodb)
-  #
-
   DEFAULT_REDIS_SETTINGS = {:host => "localhost", :port => 6379}
 
   class Sync

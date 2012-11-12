@@ -18,13 +18,15 @@ module BarnyardHarvester
       @debug = args.fetch(:debug) { false }
       @log = args.fetch(:logger) { Logger.new(STDOUT) }
 
-      redis_args = @redis_settings
+      @redis_settings.delete(:db)
+
+      Resque.redis = Redis.new(@redis_settings)
 
       # This sets the database number for redis to store the cached data
-      redis_args[:db] = args[:crop_number]
+      @redis_settings[:db] = args[:crop_number]
 
       # Connect to Redis
-      @redis = Redis.new(redis_args)
+      @redis = Redis.new(@redis_settings)
 
     end
 

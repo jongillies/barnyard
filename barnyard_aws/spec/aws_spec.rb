@@ -13,7 +13,7 @@ describe BarnyardAws do
 
     redis_settings = {
         :host => "localhost",
-        :port => 6379,
+        :port => 6379
     }
 
     [BarnyardAws::AwsElbs, BarnyardAws::AwsSecurityGroups,

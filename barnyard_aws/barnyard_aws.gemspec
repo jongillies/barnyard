@@ -3,7 +3,7 @@ $:.push File.expand_path("../lib", __FILE__)
 require "barnyard_aws/version"
 
 Gem::Specification.new do |gem|
-  gem.name          = "BarnyardAws"
+  gem.name          = "barnyard_aws"
   gem.version       = BarnyardAws::VERSION
   gem.authors       = ["Jon Gillies"]
   gem.email         = %w(supercoder@gmail.com)
