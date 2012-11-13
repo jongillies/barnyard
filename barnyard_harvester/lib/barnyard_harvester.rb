@@ -14,7 +14,7 @@ module BarnyardHarvester
 
     attr_reader :my_barn, :my_add_queue, :my_change_queue, :my_delete_queue
     attr_reader :add_count, :change_count, :delete_count, :source_count, :cache_count
-    attr_reader :resque_enqueue, :redis_settings
+    attr_reader :redis_settings
     attr_reader :harvester_uuid, :backend, :crop_number
 
     def initialize(args)
