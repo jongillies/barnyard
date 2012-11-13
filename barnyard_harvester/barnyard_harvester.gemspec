@@ -24,6 +24,6 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency "crack"
   gem.add_runtime_dependency "json"
   gem.add_runtime_dependency "uuid"
-  gem.add_runtime_dependency "bson_ext"
-  gem.add_runtime_dependency "mongo"
+  gem.add_runtime_dependency "bson_ext", "= 1.6.0"
+  gem.add_runtime_dependency "mongo", "= 1.6.0"
 end

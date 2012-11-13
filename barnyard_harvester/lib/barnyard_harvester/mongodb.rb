@@ -1,7 +1,13 @@
-require "mongodb"
+require "mongo"
 require "crack"
 require "json"
 require "resque"
+puts `pwd`
+
+require "barnyard_harvester/mongodb_helper"
+
+#
+#require "lib/barnyard_harvester/mongodb_helper"
 
 module BarnyardHarvester
 
@@ -21,22 +27,22 @@ module BarnyardHarvester
 
       @crop_number = args.fetch(:crop_number) { raise "You must provide :crop_number" }
       @redis_settings = args.fetch(:redis_settings) { DEFAULT_REDIS_SETTINGS }
-      @mongo_settings = args.fetch(:redis_settings) { DEFAULT_MONGO_SETTINGS }
+      @mongodb_settings = args.fetch(:mongodb_settings) { MONGODB_SETTINGS }
       @debug = args.fetch(:debug) { false }
       @log = args.fetch(:logger) { Logger.new(STDOUT) }
 
-      @mongo_settings = args.fetch(:db) { raise "You must provide :db" }
-      @mongo_settings = args.fetch(:collection) { raise "You must provide :collection" }
+      @mongodb_settings.fetch(:db) { raise "You must provide :db" }
+      @mongodb_settings.fetch(:collection) { raise "You must provide :collection" }
 
       @redis_settings.delete(:db)
       Resque.redis = Redis.new(@redis_settings)
 
-      @mongo_settings[:debug] = @debug
+      @mongodb_settings[:debug] = @debug
 
-      @mongo = MongoHelper.connect @mongo_settings
+      @mongo = BarnyardHarvester::MongoDbHelper.connect @mongodb_settings
 
-      @collection_name = @mongo_settings[:collection]
-      @collection = @mongo.collection(@mongo_settings[:collection])
+      @collection_name = @mongodb_settings[:collection]
+      @collection = @mongo.collection(@mongodb_settings[:collection])
 
       @collection
     end

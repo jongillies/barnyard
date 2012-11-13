@@ -33,7 +33,7 @@ module BarnyardHarvester
         @mongo.authenticate(args[:user], args[:password])
       end
 
-      return @mongo
+      @mongo
     end
   end
 end

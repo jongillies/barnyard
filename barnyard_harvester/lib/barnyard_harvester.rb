@@ -27,6 +27,7 @@ module BarnyardHarvester
 
       @backend = args.fetch(:backend) { :redis }
 
+      require "barnyard_harvester/#{@backend.to_s}_helper"
       require "barnyard_harvester/#{@backend.to_s}_queue"
       require "barnyard_harvester/#{@backend.to_s}"
 
