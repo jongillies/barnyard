@@ -41,11 +41,14 @@ describe BarnyardHarvester do
 
   def flush
 
-    r = Redis.new(REDIS_SETTINGS)
+    require "barnyard_harvester/mongodb_helper"
 
-    r.keys.each do |k|
-      r.del k
-      #puts "deleted #{k}"
+    mongo = BarnyardHarvester::MongoDbHelper.connect MONGODB_SETTINGS
+    collection_name = MONGODB_SETTINGS[:collection]
+    collection = mongo.collection(collection_name)
+
+    collection.find.each do |row|
+      collection.remove("_id" => row["_id"])
     end
 
   end
@@ -74,10 +77,16 @@ describe BarnyardHarvester do
 
     data = YAML::load_file "spec/fixtures/data-init.yml"
 
-    redis = Redis.new(REDIS_SETTINGS)
+    mongo = BarnyardHarvester::MongoDbHelper.connect MONGODB_SETTINGS
+    collection = mongo.collection(MONGODB_SETTINGS[:collection])
 
     data.each do |primary_key, value|
-      value.to_json.should eq(redis.get(primary_key))
+
+      doc = collection.find("_id" => primary_key).to_a[0]
+
+      doc.delete("_id")
+
+      value.should eq(doc)
     end
 
   end

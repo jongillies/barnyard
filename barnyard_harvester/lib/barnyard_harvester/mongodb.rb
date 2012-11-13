@@ -2,8 +2,6 @@ require "mongo"
 require "crack"
 require "json"
 require "resque"
-puts `pwd`
-
 require "barnyard_harvester/mongodb_helper"
 
 #
