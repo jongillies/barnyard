@@ -16,10 +16,19 @@ describe BarnyardAws do
         :port => 6379
     }
 
-    [BarnyardAws::AwsElbs, BarnyardAws::AwsSecurityGroups,
+    mongodb_settings = {
+        :host_list => "localhost:27017",
+        :db => "test_db",
+    }
+
+    [BarnyardAws::AwsElbs,
+     BarnyardAws::AwsSecurityGroups,
      BarnyardAws::AwsInstances, BarnyardAws::AwsSnapshots,
      BarnyardAws::AwsVolumes, BarnyardAws::AwsSubnets,
-     BarnyardAws::AwsIamUsers, BarnyardAws::AwsIamGroupPolicies].each do |o|
+     BarnyardAws::AwsIamUsers, BarnyardAws::AwsIamGroupPolicies
+    ].each do |o|
+
+      mongodb_settings[:collection] = o.to_s
 
       o.new(aws_access_key_id: AWS_ACCESS_KEY_ID,
             aws_secret_access_key: AWS_SECRET_ACCESS_KEY,
@@ -28,6 +37,8 @@ describe BarnyardAws do
             crop_number: 1,
             logger: my_logger,
             redis_settings: REDIS_SETTINGS,
+            mongodb_settings: mongodb_settings,
+            backend: :mongodb,
             debug: true)
 
     end

@@ -27,6 +27,10 @@ module BarnyardHarvester
 
       @backend = args.fetch(:backend) { :redis }
 
+      if @backend == :mongodb
+        @mongodb_settings = args.fetch(:mongodb_settings) { raise "You must provide :mongodb_settings" }
+      end
+
       require "barnyard_harvester/#{@backend.to_s}_helper" if File.exist? "barnyard_harvester/#{@backend.to_s}_helper"
       require "barnyard_harvester/#{@backend.to_s}_queue"
       require "barnyard_harvester/#{@backend.to_s}"

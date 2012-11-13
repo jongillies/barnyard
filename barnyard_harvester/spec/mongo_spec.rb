@@ -14,10 +14,22 @@ REDIS_SETTINGS = {
 }
 
 MONGODB_SETTINGS = {
-    :host_list => "localhost:27017",
+    :host => "localhost",
     :collection => "test_collection",
-    :db => "test_db"
+    :db => "test_database",
+    :collection => "test_collection"
 }
+
+MONGODB_REPLICA_SET_SETTINGS = {
+    :host => ["ip-172-19-31-44.c.qaapollogrp.edu:27017", "ip-172-19-30-49.c.qaapollogrp.edu:27017", "ip-172-19-31-202.c.qaapollogrp.edu:27017"],
+    :collection => "test_collection",
+    :db => "test_database",
+    :user => "honeybadger",
+    :password => "0joQuk35vJM05Hj",
+    :collection => "test_collection"
+}
+
+$mongo_settings = MONGODB_REPLICA_SET_SETTINGS
 
 describe BarnyardHarvester do
 
@@ -28,7 +40,7 @@ describe BarnyardHarvester do
     my_logger = Logger.new(STDOUT)
     my_logger.level = Logger::INFO
 
-    h = BarnyardHarvester::Sync.new(:backend => backend, :debug => false, :mongo_settings => MONGODB_SETTINGS, :crop_number => CROP_NUMBER, :redis_settings => REDIS_SETTINGS, :logger => my_logger)
+    h = BarnyardHarvester::Sync.new(:backend => backend, :debug => false, :mongodb_settings => $mongo_settings, :crop_number => CROP_NUMBER, :redis_settings => REDIS_SETTINGS, :logger => my_logger)
 
     h.run do
       data.each do |primary_key, value|
@@ -43,8 +55,11 @@ describe BarnyardHarvester do
 
     require "barnyard_harvester/mongodb_helper"
 
-    mongo = BarnyardHarvester::MongoDbHelper.connect MONGODB_SETTINGS
-    collection_name = MONGODB_SETTINGS[:collection]
+    my_logger = Logger.new(STDOUT)
+    my_logger.level = Logger::INFO
+
+    mongo = BarnyardHarvester::MongoDbHelper.connect $mongo_settings.merge(logger: my_logger)
+    collection_name = $mongo_settings[:collection]
     collection = mongo.collection(collection_name)
 
     collection.find.each do |row|
@@ -77,8 +92,8 @@ describe BarnyardHarvester do
 
     data = YAML::load_file "spec/fixtures/data-init.yml"
 
-    mongo = BarnyardHarvester::MongoDbHelper.connect MONGODB_SETTINGS
-    collection = mongo.collection(MONGODB_SETTINGS[:collection])
+    mongo = BarnyardHarvester::MongoDbHelper.connect $mongo_settings
+    collection = mongo.collection($mongo_settings[:collection])
 
     data.each do |primary_key, value|
 

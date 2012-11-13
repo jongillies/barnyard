@@ -25,7 +25,7 @@ module BarnyardHarvester
 
       @crop_number = args.fetch(:crop_number) { raise "You must provide :crop_number" }
       @redis_settings = args.fetch(:redis_settings) { DEFAULT_REDIS_SETTINGS }
-      @mongodb_settings = args.fetch(:mongodb_settings) { MONGODB_SETTINGS }
+      @mongodb_settings = args.fetch(:mongodb_settings) { MongoSettings }
       @debug = args.fetch(:debug) { false }
       @log = args.fetch(:logger) { Logger.new(STDOUT) }
 
@@ -36,6 +36,7 @@ module BarnyardHarvester
       Resque.redis = Redis.new(@redis_settings)
 
       @mongodb_settings[:debug] = @debug
+      @mongodb_settings[:logger] = @log
 
       @mongo = BarnyardHarvester::MongoDbHelper.connect @mongodb_settings
 

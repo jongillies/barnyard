@@ -14,10 +14,10 @@ module BarnyardHarvester
       # Connect to Mongo
       if args.has_key? :host
         if args[:host].is_a? Array
-          @log.info "Connecting to replica set #{args[:host]}"
+          @log.debug "Connecting to replica set #{args[:host]}"
           @mongo = Mongo::ReplSetConnection.new(args[:host]).db(args[:db])
         else
-          @log.info "Connecting to single host #{args[:host]}"
+          @log.debug "Connecting to single host #{args[:host]}"
           @mongo = Mongo::Connection.new(args[:host].split(":")[0], args[:host].split(":")[1]).db(args[:db])
         end
       else
@@ -29,7 +29,7 @@ module BarnyardHarvester
       #auth = db.authenticate
 
       unless args[:user].to_s == ''
-        @log.info "Authenticating as #{args[:user]}"
+        @log.debug "Authenticating as #{args[:user]}"
         @mongo.authenticate(args[:user], args[:password])
       end
 
