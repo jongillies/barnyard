@@ -119,6 +119,8 @@ describe BarnyardHarvester do
     h.source_count.should eq(data.count)
     h.cache_count.should eq(data.count)
 
+    h.my_barn.log_run("#{file}-#{Random.rand(100)}", @crop_number, Time.now, Time.now, h.source_count, h.change_count, h.add_count, h.delete_count)
+
   end
 
   it "test change one record" do
@@ -135,6 +137,8 @@ describe BarnyardHarvester do
     h.source_count.should eq(data.count)
     h.cache_count.should eq(data.count)
 
+    h.my_barn.log_run("#{file}-#{Random.rand(100)}", @crop_number, Time.now, Time.now, h.source_count, h.change_count, h.add_count, h.delete_count)
+
   end
 
   it "test delete one record" do
@@ -145,12 +149,13 @@ describe BarnyardHarvester do
 
     h = load_and_process_file(file, :mongodb)
 
-
     h.add_count.should eq(0)
     h.delete_count.should eq(1)
     h.change_count.should eq(0)
     h.source_count.should eq(data.count)
     h.cache_count.should eq(data.count + 1)
+
+    h.my_barn.log_run("#{file}-#{Random.rand(100)}", @crop_number, Time.now, Time.now, h.source_count, h.change_count, h.add_count, h.delete_count)
 
   end
 
@@ -169,6 +174,8 @@ describe BarnyardHarvester do
     h.change_count.should eq(0)
     h.source_count.should eq(1)
     h.cache_count.should eq(init_data.count + 1)
+
+    h.my_barn.log_run("#{file}-#{Random.rand(100)}", @crop_number, Time.now, Time.now, h.source_count, h.change_count, h.add_count, h.delete_count)
 
   end
 
