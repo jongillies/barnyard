@@ -5,10 +5,6 @@ require "resque"
 
 module BarnyardHarvester
 
-  class HarvesterLogs
-    @queue = :logs_harvester
-  end
-
   class Barn
 
     def initialize(args)
@@ -35,7 +31,7 @@ module BarnyardHarvester
       begin
         Resque.enqueue(HarvesterLogs, Time.now, harvester_uuid, crop_number, began_at, ended_at, source_count, change_count, add_count, delete_count)
       rescue Exception => e
-        logger.fatal "#{self.class} Fail in Resque.enqueue of HarvesterLogs. #{e.backtrace}"
+        @log.fatal "#{self.class} Fail in Resque.enqueue of HarvesterLogs. #{e.backtrace}"
       end
 
     end

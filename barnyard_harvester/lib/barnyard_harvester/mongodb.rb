@@ -9,10 +9,6 @@ require "barnyard_harvester/mongodb_helper"
 
 module BarnyardHarvester
 
-  class HarvesterLogs
-    @queue = :logs_harvester
-  end
-
   DEFAULT_MONGO_SETTINGS = {
       :host_list => "localhost:27017",
       :collection => "test_collection",

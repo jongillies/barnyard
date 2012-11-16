@@ -1,15 +1,11 @@
 module BarnyardHarvester
 
-  class ChangeLogs
-    @queue = :logs_change
-  end
-
   class Queue
 
     class ResqueQueue
       def initialize(queue, queued_at, harvester_uuid, crop_change_uuid, crop_number, primary_key, transaction_type, value, old_value)
         Resque.enqueue(queue, queued_at, harvester_uuid, crop_change_uuid, crop_number, primary_key, transaction_type, value, old_value)
-        Resque.enqueue(ChangeLogs,queued_at, harvester_uuid, crop_change_uuid, crop_number, primary_key, transaction_type, value, old_value)
+        Resque.enqueue(ChangeLogs, queued_at, harvester_uuid, crop_change_uuid, crop_number, primary_key, transaction_type, value, old_value)
       end
     end
 
@@ -30,7 +26,7 @@ module BarnyardHarvester
       rescue
         # Set the queue name to this apol_harvester's id prefixed with a Q_
         #Object.const_set(resque_class_name, Class.new { @queue =  "Q_#{args[:crop_number]}"})
-        Object.const_set(resque_class_name, Class.new { @queue =  "Farmer"})
+        Object.const_set(resque_class_name, Class.new { @queue = "Farmer" })
       end
 
       @resque_queue = Object.const_get(resque_class_name)

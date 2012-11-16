@@ -4,6 +4,23 @@ require "logger"
 require "barnyard_harvester/version"
 
 module BarnyardHarvester
+
+  class ChangeLogs
+    @queue = :logs_change
+  end
+
+  class HarvesterLogs
+    @queue = :logs_harvester
+  end
+
+  class DeliveryLogs
+    @queue = :logs_delivery
+  end
+
+  class TransactionLogs
+    @queue = :logs_transaction
+  end
+
   ADD = "add"
   CHANGE = "change"
   DELETE = "delete"
@@ -147,7 +164,7 @@ module BarnyardHarvester
       @my_change_queue.flush
       @my_delete_queue.flush
 
-      @my_barn.log_run(@harvester_uuid, @crop_number, @began_at, @ended_at, @source_count, @change_count, @add_count, @delete_count)
+#      @my_barn.log_run(@harvester_uuid, @crop_number, @began_at, @ended_at, @source_count, @change_count, @add_count, @delete_count)
 
     end
 
