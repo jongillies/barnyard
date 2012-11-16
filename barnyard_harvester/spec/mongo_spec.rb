@@ -29,7 +29,7 @@ MONGODB_REPLICA_SET_SETTINGS = {
     :collection => "test_collection"
 }
 
-$mongo_settings = MONGODB_REPLICA_SET_SETTINGS
+$mongo_settings = MONGODB_SETTINGS
 
 describe BarnyardHarvester do
 
