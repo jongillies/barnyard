@@ -12,6 +12,11 @@ REDIS_SETTINGS = {
     :db => CROP_NUMBER
 }
 
+RABBITMQ_SETTINGS = {
+    :host => "localhost"
+#    :port => 6163
+}
+
 describe BarnyardHarvester do
 
   def load_and_process_file(file, backend)
@@ -21,7 +26,7 @@ describe BarnyardHarvester do
     my_logger = Logger.new(STDOUT)
     my_logger.level = Logger::INFO
 
-    h = BarnyardHarvester::Sync.new(:backend => backend, :debug => false, :crop_number => CROP_NUMBER, :redis_settings => REDIS_SETTINGS, :logger => my_logger)
+    h = BarnyardHarvester::Sync.new(:queueing => :rabbitmq, :rabbitmq_settings => RABBITMQ_SETTINGS, :backend => backend, :debug => false, :crop_number => CROP_NUMBER, :redis_settings => REDIS_SETTINGS, :logger => my_logger)
 
     h.run do
       data.each do |primary_key, value|
@@ -88,6 +93,8 @@ describe BarnyardHarvester do
     h.source_count.should eq(data.count)
     h.cache_count.should eq(data.count)
 
+#    h.log_run("#{file}-#{Random.rand(100)}", @crop_number, Time.now, Time.now, h.source_count, h.change_count, h.add_count, h.delete_count)
+
   end
 
   it "test change one record" do
@@ -103,6 +110,8 @@ describe BarnyardHarvester do
     h.change_count.should eq(1)
     h.source_count.should eq(data.count)
     h.cache_count.should eq(data.count)
+
+#    h.my_barn.log_run("#{file}-#{Random.rand(100)}", @crop_number, Time.now, Time.now, h.source_count, h.change_count, h.add_count, h.delete_count)
 
   end
 
@@ -121,6 +130,8 @@ describe BarnyardHarvester do
     h.source_count.should eq(data.count)
     h.cache_count.should eq(data.count + 1)
 
+#    h.my_barn.log_run("#{file}-#{Random.rand(100)}", @crop_number, Time.now, Time.now, h.source_count, h.change_count, h.add_count, h.delete_count)
+
   end
 
   it "test delete all records and add one" do
@@ -138,6 +149,8 @@ describe BarnyardHarvester do
     h.change_count.should eq(0)
     h.source_count.should eq(1)
     h.cache_count.should eq(init_data.count + 1)
+
+#    h.my_barn.log_run("#{file}-#{Random.rand(100)}", @crop_number, Time.now, Time.now, h.source_count, h.change_count, h.add_count, h.delete_count)
 
   end
 

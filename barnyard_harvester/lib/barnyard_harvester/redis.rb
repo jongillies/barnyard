@@ -26,16 +26,6 @@ module BarnyardHarvester
 
     end
 
-    def log_run(harvester_uuid, crop_number, began_at, ended_at, source_count, change_count, add_count, delete_count)
-
-      begin
-        Resque.enqueue(HarvesterLogs, Time.now, harvester_uuid, crop_number, began_at, ended_at, source_count, change_count, add_count, delete_count)
-      rescue Exception => e
-        @log.fatal "#{self.class} Fail in Resque.enqueue of HarvesterLogs. #{e.backtrace}"
-      end
-
-    end
-
     def delete(primary_key)
       check_key primary_key
 

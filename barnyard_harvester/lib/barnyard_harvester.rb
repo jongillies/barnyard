@@ -5,22 +5,6 @@ require "barnyard_harvester/version"
 
 module BarnyardHarvester
 
-  class ChangeLogs
-    @queue = :logs_change
-  end
-
-  class HarvesterLogs
-    @queue = :logs_harvester
-  end
-
-  class DeliveryLogs
-    @queue = :logs_delivery
-  end
-
-  class TransactionLogs
-    @queue = :logs_transaction
-  end
-
   ADD = "add"
   CHANGE = "change"
   DELETE = "delete"
@@ -41,6 +25,13 @@ module BarnyardHarvester
       @debug = args.fetch(:debug) { false }
       @log = args.fetch(:logger) { Logger.new(STDOUT) }
 
+      @queueing = args[:queueing]
+
+      if @queueing == :rabbitmq
+        @rabbitmq_settings = args.fetch(:rabbitmq_settings) { raise "You must provide :rabbitmq_settings" }
+      else
+        @queueing = :resque
+      end
 
       @backend = args.fetch(:backend) { :redis }
 
@@ -49,7 +40,7 @@ module BarnyardHarvester
       end
 
       require "barnyard_harvester/#{@backend.to_s}_helper" if File.exist? "barnyard_harvester/#{@backend.to_s}_helper"
-      require "barnyard_harvester/#{@backend.to_s}_queue"
+      require "barnyard_harvester/#{@queueing.to_s}_queue"
       require "barnyard_harvester/#{@backend.to_s}"
 
 #      YAML::ENGINE.yamler = 'syck'
@@ -131,12 +122,12 @@ module BarnyardHarvester
         end
       else
         # We got add!
-        begin
+        #begin
           @my_add_queue.push(@harvester_uuid, crop_change_uuid, @crop_number, primary_key, BarnyardHarvester::ADD, value)
-        rescue Exception => e
-          @log.fatal "FATAL error pushing add #{primary_key} to queue. #{e}"
-          exit 1
-        end
+        #rescue Exception => e
+        #  @log.fatal "FATAL error pushing add #{primary_key} to queue. #{e}"
+        #  exit 1
+        #end
 
         @my_barn[primary_key] = value
         @add_count += 1
@@ -146,6 +137,15 @@ module BarnyardHarvester
     def stats
       "(#{@add_count}) adds, (#{@delete_count}) deletes, (#{@change_count}) changes, (#{@source_count}) source records, (#{@cache_count}) cache records"
     end
+
+    #def log_run(harvester_uuid, crop_number, began_at, ended_at, source_count, change_count, add_count, delete_count)
+    #
+    #  #begin
+    #  #rescue Exception => e
+    #  #  @log.fatal "#{self.class} Fail in Resque.enqueue of HarvesterLogs. #{e.backtrace}"
+    #  #end
+    #
+    #end
 
     def run
 
@@ -158,13 +158,15 @@ module BarnyardHarvester
 
       @ended_at = Time.now
 
+
+      @my_add_queue.log_run(@harvester_uuid, @crop_number, @began_at, @ended_at, @source_count, @change_count, @add_count, @delete_count)
+
       # Let Farmer know I'm done and to flush the updates
       @my_barn.flush
       @my_add_queue.flush
       @my_change_queue.flush
       @my_delete_queue.flush
 
-#      @my_barn.log_run(@harvester_uuid, @crop_number, @began_at, @ended_at, @source_count, @change_count, @add_count, @delete_count)
 
     end
 
