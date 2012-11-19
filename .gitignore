@@ -3,4 +3,5 @@
 .bundle
 Gemfile.lock
 pkg/*
+*.DS_Store
 1-BarnyardHarvester::*
