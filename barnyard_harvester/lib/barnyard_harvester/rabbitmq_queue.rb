@@ -55,16 +55,16 @@ module BarnyardHarvester
       @bunny = Bunny.new(@rabbitmq_settings)
       @bunny.start
 
-      @direct_exchange = @bunny.exchange('barnyard');
+      @direct_exchange = @bunny.exchange('');
 
     end
 
     def push(harvester_uuid, crop_change_uuid, crop_number, primary_key, transaction_type, value, old_value=Hash.new)
       check_key primary_key
 
-      enqueue(@farmer_queue, DateTime.now, harvester_uuid, crop_change_uuid, crop_number, primary_key, transaction_type, value.to_json, old_value.to_json)
+      enqueue(QUEUE_FARMER, DateTime.now, harvester_uuid, crop_change_uuid, crop_number, primary_key, transaction_type, value.to_json, old_value.to_json)
 
-      message = "RabbitQueue: barnyard-farmer, Now: #{DateTime.now}, Harvester:#{harvester_uuid}, Change:#{crop_change_uuid} crop_number: #{crop_number}, key: #{primary_key}, transaction_type: #{transaction_type})"
+      message = "RabbitQueue: #{QUEUE_FARMER}, Now: #{DateTime.now}, Harvester:#{harvester_uuid}, Change:#{crop_change_uuid} crop_number: #{crop_number}, key: #{primary_key}, transaction_type: #{transaction_type})"
 
       if @log.level == Logger::DEBUG
         message += ", value: #{value.to_json}, old_value: #{old_value.to_json}"
