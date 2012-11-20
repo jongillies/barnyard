@@ -27,10 +27,13 @@ module BarnyardHarvester
 
       @queueing = args[:queueing]
 
-      if @queueing == :rabbitmq
-        @rabbitmq_settings = args.fetch(:rabbitmq_settings) { raise "You must provide :rabbitmq_settings" }
-      else
-        @queueing = :resque
+      case @queueing
+        when :rabbitmq
+          @rabbitmq_settings = args.fetch(:rabbitmq_settings) { raise "You must provide :rabbitmq_settings" }
+        when :sqs
+          @sqs_settings = args.fetch(:sqs_settings) { raise "You must provide :sqs_settings" }
+        else
+          @queueing = :redis
       end
 
       @backend = args.fetch(:backend) { :redis }
