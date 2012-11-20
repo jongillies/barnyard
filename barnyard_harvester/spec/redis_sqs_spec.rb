@@ -26,9 +26,15 @@ describe BarnyardHarvester do
     data = YAML::load_file file
 
     my_logger = Logger.new(STDOUT)
-    my_logger.level = Logger::INFO
+    my_logger.level = Logger::DEBUG
 
-    h = BarnyardHarvester::Sync.new(:queueing => :sqs, :sqs_settings => SQS_SETTINGS, :backend => backend, :debug => false, :crop_number => CROP_NUMBER, :redis_settings => REDIS_SETTINGS, :logger => my_logger)
+    h = BarnyardHarvester::Sync.new(:queueing => :sqs,
+                                    :sqs_settings => SQS_SETTINGS,
+                                    :backend => backend,
+                                    :debug => true,
+                                    :crop_number => CROP_NUMBER,
+                                    :redis_settings => REDIS_SETTINGS,
+                                    :logger => my_logger)
 
     h.run do
       data.each do |primary_key, value|

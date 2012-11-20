@@ -23,8 +23,13 @@ module BarnyardHarvester
 
       json_payload = payload.to_json
 
+      @log.debug "Starting send_message to farmer..."
       @farmer_queue.send_message(json_payload)
+      @log.debug "Done send_message to farmer..."
+
+      @log.debug "Starting send_message to changes..."
       @change_queue.send_message(json_payload)
+      @log.debug "Done send_message to changes..."
 
     end
 
