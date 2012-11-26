@@ -24,15 +24,15 @@ module BarnyardHarvester
       table_name = "barnyard_crop_id-#{@crop_number}"
 
       begin
-        @table = @db.tables.create(table_name,10,5)
+        @table = @db.tables.create(table_name, 10, 5)
         sleep 1 while @table.status == :creating
+        @table.hash_key = [:id, :string]
         puts @table.status
         puts "Creating table #{table_name}"
       rescue AWS::DynamoDB::Errors::ResourceInUseException
         puts "#{table_name} table exists"
         @table = @db.tables[table_name]
         @table.hash_key = [:id, :string]
-
       end
 
     end
@@ -40,38 +40,41 @@ module BarnyardHarvester
     def delete(primary_key)
       check_key primary_key
 
-      value = @table.items.find('id' => primary_key)  # Save the value
-      @dynamodb.del primary_key # Delete the key
+      item = @table.items.find('id' => primary_key).first # Save the value
+      value = item.attributes['value']
+      item.delete # Delete the key
       Crack::JSON.parse(value) # Return the object
     end
 
     def []= primary_key, object
       check_key primary_key
       check_object object
-
-      @dynamodb.set primary_key, object.to_json
+      @table.items.create('id' => primary_key, 'value' => object.to_json)
     end
 
     def [] primary_key
       check_key primary_key
 
-      Crack::JSON.parse(@dynamodb.get primary_key)
+      Crack::JSON.parse(@table.items.find('id' => primary_key).first.attributes['value'])
     end
 
     def has_key?(primary_key)
       check_key primary_key
 
-      if @dynamodb.exists primary_key
-        Crack::JSON.parse(@dynamodb.get primary_key)
-      else
-        nil
+      begin
+        @table.items.find('id' => primary_key).first == nil
+      rescue
+        false
       end
+
     end
 
     def each
-      @dynamodb.keys('*').each do |primary_key|
-        yield primary_key, Crack::JSON.parse(@dynamodb.get(primary_key))
+
+      @table.items.each do |i|
+        yield i.attributes['id'], i.attributes['value']
       end
+
     end
 
     def flush
