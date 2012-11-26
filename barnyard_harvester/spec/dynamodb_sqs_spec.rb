@@ -93,14 +93,7 @@ describe BarnyardHarvester do
     data = YAML::load_file "spec/fixtures/data-init.yml"
 
     data.each do |primary_key, value|
-
-      puts "PRIMARY_KEY=#{primary_key}"
-      puts "VALUE=#{value.to_json}"
-      puts "DYN=#{get_table.items.find('id' => primary_key).first.attributes['value']}"
-      puts
-      puts
-
-#      value.to_json.should eq(get_table.items.find('id' => primary_key).first.attributes['value'])
+      value.to_json.should eq(get_table.items.where("id" => primary_key).first.attributes['value'])
     end
 
   end

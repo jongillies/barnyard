@@ -40,7 +40,7 @@ module BarnyardHarvester
     def delete(primary_key)
       check_key primary_key
 
-      item = @table.items.find('id' => primary_key).first # Save the value
+      item = @table.items.where("id" => primary_key).first # Save the value
       value = item.attributes['value']
       item.delete # Delete the key
       Crack::JSON.parse(value) # Return the object
@@ -55,17 +55,13 @@ module BarnyardHarvester
     def [] primary_key
       check_key primary_key
 
-      Crack::JSON.parse(@table.items.find('id' => primary_key).first.attributes['value'])
+      Crack::JSON.parse(@table.items.where("id" => primary_key).first.attributes['value'])
     end
 
     def has_key?(primary_key)
       check_key primary_key
 
-      begin
-        @table.items.find('id' => primary_key).first == nil
-      rescue
-        false
-      end
+       @table.items.where("id" => primary_key).count == 1
 
     end
 
