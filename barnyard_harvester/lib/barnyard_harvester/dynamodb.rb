@@ -27,10 +27,7 @@ module BarnyardHarvester
         @table = @db.tables.create(table_name, 10, 5)
         sleep 1 while @table.status == :creating
         @table.hash_key = [:id, :string]
-        puts @table.status
-        puts "Creating table #{table_name}"
       rescue AWS::DynamoDB::Errors::ResourceInUseException
-        puts "#{table_name} table exists"
         @table = @db.tables[table_name]
         @table.hash_key = [:id, :string]
       end

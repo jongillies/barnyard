@@ -16,7 +16,7 @@ module BarnyardHarvester
 
       @redis_settings.delete(:db)
 
-      Resque.redis = Redis.new(@redis_settings)
+      #Resque.redis = Redis.new(@redis_settings)
 
       # This sets the database number for redis to store the cached data
       @redis_settings[:db] = args[:crop_number]

@@ -33,7 +33,7 @@ module BarnyardHarvester
         when :sqs
           @sqs_settings = args.fetch(:sqs_settings) { raise "You must provide :sqs_settings" }
         else
-          @queueing = :redis
+          @queueing = :resque
       end
 
       @backend = args.fetch(:backend) { :redis }

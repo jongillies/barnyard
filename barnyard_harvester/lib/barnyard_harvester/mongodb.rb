@@ -29,7 +29,7 @@ module BarnyardHarvester
       @mongodb_settings.fetch(:collection) { raise "You must provide :collection" }
 
       @redis_settings.delete(:db)
-      Resque.redis = Redis.new(@redis_settings)
+      #Resque.redis = Redis.new(@redis_settings)
 
       @mongodb_settings[:debug] = @debug
       @mongodb_settings[:logger] = @log

@@ -24,8 +24,6 @@ module BarnyardHarvester
       end
     end
 
-
-
     def log_run(harvester_uuid, crop_number, began_at, ended_at, source_count, change_count, add_count, delete_count)
 
       Resque.enqueue(HarvesterLogs, harvester_uuid, crop_number, began_at, ended_at, source_count, change_count, add_count, delete_count)
