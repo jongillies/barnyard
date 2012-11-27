@@ -2,6 +2,8 @@
 
 The Harvester gem provides a simple interface where you can iterate your data source and send records to the sync engine.  The default backend storage is Redis.  Since the workers will use Resque which requires Redis, this make sense to use Redis to cache the data.  However, any backend cache can be implemented.
 
+I've now implemented using DynamoDB for the backend and SQS for the messages.
+
 Your data sources are called "crops".  You must assign a unique integer 1..100 to each crop.  This is the integer that is used to create the Redis collection.  By default Redis only allows a maximum of 16 databases, so this must be changed if you go above 16.
 
 WARNING!  Do not use crop number 1-9 in production, they are reserved for system testing.
