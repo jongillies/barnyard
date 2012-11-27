@@ -30,6 +30,10 @@ module BarnyardHarvester
       rescue AWS::DynamoDB::Errors::ResourceInUseException
         @table = @db.tables[table_name]
         @table.hash_key = [:id, :string]
+      rescue AWS::DynamoDB::Errors::LimitExceededException
+        @log.warn "Retrying creation in 10 seconds, AWS::DynamoDB::Errors::LimitExceededException"
+        sleep 10
+        retry
       end
 
     end
