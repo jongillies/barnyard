@@ -180,13 +180,13 @@ module BarnyardCcfeeder
     def subscribed?(subscriber_id, crop_number)
 
       @subscriptions_cache.each do |id, subscription|
-        @log.debug "subscriber_id: #{id}"
 
-        if subscription["subscriber_id"] == subscriber_id && subscription["crop"]["crop_number"] == crop_number
+        if subscription["subscriber_id"] == subscriber_id && subscription["crop"]["crop_number"].to_i == crop_number.to_i
           return true
         end
       end
-      return false
+
+      false
 
     end
 
