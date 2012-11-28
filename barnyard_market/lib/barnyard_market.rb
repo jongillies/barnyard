@@ -33,25 +33,32 @@ module BarnyardMarket
 
       while (msg = @farmer_queue.receive_message) do
 
-        payload = Crack::JSON.parse(msg.body)
+        begin
+          payload = Crack::JSON.parse(msg.body)
 
-        @log.info "Received #{payload["transaction_type"].upcase} for crop #{payload["crop_number"]}"
+          @log.info "Received #{payload["transaction_type"].upcase} for crop #{payload["crop_number"]}"
 
-        subscribed = @cachecow.has_subscribers(payload["crop_number"])
+          subscribed = @cachecow.has_subscribers(payload["crop_number"])
 
-        @log.info "#{subscribed.count} subscriptions for crop #{payload["crop_number"]}"
+          @log.info "#{subscribed.count} subscriptions for crop #{payload["crop_number"]}"
 
-        subscribed.each do |s|
-          queue_name = "barnyard-transactions-subscriber-#{s["id"]}-crop-#{payload["crop_number"]}"
-          queue = @sqs.queues.create(queue_name)
+          subscribed.each do |s|
+            queue_name = "barnyard-transactions-subscriber-#{s["id"]}-crop-#{payload["crop_number"]}"
+            queue = @sqs.queues.create(queue_name)
 
-          payload["subscriber"] = s["id"]
-          payload["transaction_uuid"] = UUID.new.generate
+            payload["subscriber"] = s["id"]
+            payload["transaction_uuid"] = UUID.new.generate
 
-          @log.info "Sending message to queue #{queue_name} for subscriber #{s["id"]} for crop #{payload["crop_number"]}"
-          json_payload = payload.to_json
-          queue.send_message(json_payload)
-          @transaction_queue.send_message(json_payload)
+            @log.info "Sending message to queue #{queue_name} for subscriber #{s["id"]} for crop #{payload["crop_number"]}"
+            json_payload = payload.to_json
+            queue.send_message(json_payload)
+            @transaction_queue.send_message(json_payload)
+          end
+
+          msg.delete
+
+        rescue e
+          $stderr.puts e
         end
 
       end
