@@ -190,6 +190,15 @@ module BarnyardCcfeeder
 
     end
 
+    def has_subscribers(crop_number)
+      subscribed = Array.new
+      subscribers.each do |id,data|
+        data["id"] = id
+        subscribed << data if subscribed?(id, crop_number)
+      end
+      subscribed
+    end
+
     # a "change" is detected by the harvester
     def push_change(queued_at, harvester_uuid, change_uuid, crop_number, primary_key, transaction_type, value, old_value)
 

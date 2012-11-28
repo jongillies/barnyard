@@ -9,6 +9,10 @@ describe "this" do
 
     cc = BarnyardCcfeeder::CacheCow.new :url => "http://localhost:3000"
 
+    x = cc.has_subscribers(crop_number)
+
+    puts x.inspect
+
     cc.subscriptions.each do |subscription_id, subscription|
 
       unless subscription["active"] == true

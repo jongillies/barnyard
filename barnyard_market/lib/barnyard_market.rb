@@ -1,9 +1,13 @@
 require "barnyard_market/version"
-
-require "ccfeeder"
+require "barnyard_ccfeeder"
+require "barnyard_harvester"
+require "crack"
+require "aws-sdk"
+require "uuid"
+require "json"
 
 module BarnyardMarket
-  class DeliverSubscriptions
+  class ProcessSubscriptions
 
     def initialize(args)
 
@@ -11,50 +15,48 @@ module BarnyardMarket
       @log = args.fetch(:logger) { Logger.new(STDOUT) }
 
       @sqs_settings = args.fetch(:sqs_settings) { raise "You must provide :sqs_settings" }
-      @dynamodb_settings = args.fetch(:dynamodb_settings) { raise "You must provide :dynamodb_settings"  }
-      @cachecow_settings = args.fetch(:cachecow_settings) { raise "You must provide :cachecow_settings"  }
+      @dynamodb_settings = args.fetch(:dynamodb_settings) { raise "You must provide :dynamodb_settings" }
+      @cachecow_settings = args.fetch(:cachecow_settings) { raise "You must provide :cachecow_settings" }
 
-      @cachecow = CcFeeder::CacheCow.new(@cachecow_settings)
+      @cachecow = BarnyardCcfeeder::CacheCow.new(@cachecow_settings)
 
+      @sqs = AWS::SQS.new(@sqs_settings)
+
+      @farmer_queue = @sqs.queues.create("barnyard-farmer")
+      @transaction_queue = @sqs.queues.create("barnyard-transactions")
+
+      deliver_subscriptions
     end
 
 
-    def do_it
+    def deliver_subscriptions
 
-      Helper::LOG.info("#{self.name} GOT: #{queued_at}, harvester_uuid: #{harvester_uuid}, crop_number: #{crop_number}, primary_key: #{primary_key}, transaction_type: #{transaction_type}, value: #{value}, old_value: #{old_value}")
+      while (msg = @farmer_queue.receive_message) do
 
-      Helper::COW.subscriptions.each do |subscription_id, subscription|
+        payload = Crack::JSON.parse(msg.body)
 
-        unless subscription["active"] == true
-          Helper::LOG.info("Subscription #{subscription_id} is not active.")
-          next
+        @log.info "Received #{payload["transaction_type"].upcase} for crop #{payload["crop_number"]}"
+
+        subscribed = @cachecow.has_subscribers(payload["crop_number"])
+
+        @log.info "#{subscribed.count} subscriptions for crop #{payload["crop_number"]}"
+
+        subscribed.each do |s|
+          queue_name = "barnyard-transactions-subscriber-#{s["id"]}-crop-#{payload["crop_number"]}"
+          queue = @sqs.queues.create(queue_name)
+
+          payload["subscriber"] = s["id"]
+          payload["transaction_uuid"] = UUID.new.generate
+
+          @log.info "Sending message to queue #{queue_name} for subscriber #{s["id"]} for crop #{payload["crop_number"]}"
+          json_payload = payload.to_json
+          queue.send_message(json_payload)
+          @transaction_queue.send_message(json_payload)
         end
 
-        if Helper::COW.crops[subscription["crop_id"]]["crop_number"] == crop_number
-
-          transaction_uuid = UUID.new.generate
-
-          Object.const_set("Deliver", Class.new { @queue = "Tractor-#{subscription_id}" })
-
-          Resque.enqueue(Deliver, subscription_id, queued_at, change_uuid, transaction_uuid, crop_number, primary_key, transaction_type, value, old_value)
-
-          Resque.enqueue(TransactionLogs, subscription_id, queued_at, change_uuid, transaction_uuid, crop_number, primary_key, transaction_type, value, old_value)
-
-          #@d.push subscription_id, queued_at, change_uuid, UUID.new.generate, crop_number, primary_key, transaction_type, value, old_value
-
-        end
       end
 
     end
-
-
-    h = BarnyardMarket::DeliverSubscriptions.new(:queueing => :sqs,
-                                                 :sqs_settings => SQS_SETTINGS,
-                                                 :backend => backend,
-                                                 :debug => true,
-                                                 :dynamodb_settings => DEFAULT_DYNAMODB_SETTINGS,
-                                                 :logger => my_logger)
-
-
   end
 end
+

@@ -20,5 +20,10 @@ Gem::Specification.new do |gem|
   # specify any dependencies here; for example:
   gem.add_development_dependency "rspec"
   gem.add_runtime_dependency "aws-sdk"
+  gem.add_runtime_dependency "barnyard_ccfeeder"
+  gem.add_runtime_dependency "barnyard_harvester"
+  gem.add_runtime_dependency "crack"
+  gem.add_runtime_dependency "uuid"
+
 
 end
