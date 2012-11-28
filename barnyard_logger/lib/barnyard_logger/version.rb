@@ -1,0 +1,3 @@
+module BarnyardLogger
+  VERSION = "0.0.1"
+end
