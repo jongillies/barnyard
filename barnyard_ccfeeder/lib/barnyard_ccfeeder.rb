@@ -180,7 +180,7 @@ module BarnyardCcfeeder
     def subscribed?(subscriber_id, crop_number)
 
       @subscriptions_cache.each do |id, subscription|
-        puts "subscriber_id: #{id}"
+        @log.debug "subscriber_id: #{id}"
 
         if subscription["subscriber_id"] == subscriber_id && subscription["crop"]["crop_number"] == crop_number
           return true
@@ -328,7 +328,7 @@ module BarnyardCcfeeder
           headers_to_send["X_HUB_SIGNATURE"] = sig unless @secret_key.empty?
           response = end_point.post payload, headers_to_send
 
-          puts headers_to_send.inspect
+          @log.debug headers_to_send.inspect
 
           if (200..201) === response.code
             @delivered = true
