@@ -15,7 +15,7 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.name          = "barnyard_logger"
   gem.require_paths = ["lib"]
-  gem.version       = BarnyardMarket::VERSION
+  gem.version       = BarnyardLogger::VERSION
 
   # specify any dependencies here; for example:
   gem.add_development_dependency "rspec"
