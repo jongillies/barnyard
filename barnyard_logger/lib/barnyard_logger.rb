@@ -84,16 +84,12 @@ module BarnyardLogger
 
         payload = Crack::JSON.parse(msg.body)
 
+        # subscription_id, queued_at, $change_uuid, $transaction_uuid
         begin
           @cachecow.push_transaction(payload['subscription_id'],
                                      payload['queued_at'],
                                      payload['change_uuid'],
-                                     payload['transaction_uuid'],
-                                     payload['crop_number'],
-                                     payload['primary_key'],
-                                     payload['transaction_type'],
-                                     payload['value'],
-                                     payload['old_value'])
+                                     payload['transaction_uuid'])
           msg.delete
 
         rescue e

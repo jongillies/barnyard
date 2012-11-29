@@ -33,7 +33,7 @@ module BarnyardMarket
 
       while (msg = @farmer_queue.receive_message) do
 
-        begin
+#        begin
           payload = Crack::JSON.parse(msg.body)
 
           @log.info "Received #{payload["transaction_type"].upcase} for crop #{payload["crop_number"]}"
@@ -42,14 +42,19 @@ module BarnyardMarket
 
           @log.info "#{subscribed.count} subscriptions for crop #{payload["crop_number"]}"
 
-          subscribed.each do |s|
-            queue_name = "barnyard-transactions-subscriber-#{s["id"]}-crop-#{payload["crop_number"]}"
+          subscribed.each do |subscription_id, subscription|
+
+            #puts "Subscription ID: #{id}"
+            #puts "Subscriber   ID: #{subscription["subscriber"]["id"]}"
+            #puts "Crop Number    : #{subscription["crop"]["id"]}"
+
+            queue_name = "barnyard-transactions-subscriber-#{subscription["subscriber"]["id"]}-crop-#{subscription["crop"]["id"]}"
             queue = @sqs.queues.create(queue_name)
 
-            payload["subscriber"] = s["id"]
+            payload["subscription_id"] = subscription_id
             payload["transaction_uuid"] = UUID.new.generate
 
-            @log.info "Sending message to queue #{queue_name} for subscriber #{s["id"]} for crop #{payload["crop_number"]}"
+            @log.info "Sending message to queue #{queue_name}"
             json_payload = payload.to_json
             queue.send_message(json_payload)
             @transaction_queue.send_message(json_payload)
@@ -57,9 +62,9 @@ module BarnyardMarket
 
           msg.delete
 
-        rescue e
-          $stderr.puts e
-        end
+#        rescue e
+#          $stderr.puts e
+#        end
 
       end
 

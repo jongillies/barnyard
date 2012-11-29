@@ -13,12 +13,12 @@ module BarnyardHarvester
 
     end
 
-    def push(harvester_uuid, crop_change_uuid, crop_number, primary_key, transaction_type, value, old_value=Hash.new)
+    def push(harvester_uuid, change_uuid, crop_number, primary_key, transaction_type, value, old_value=Hash.new)
       check_key primary_key
 
       @queue[primary_key] = value.to_json
 
-      @log.debug "HashQueue: Now: #{DateTime.now}, Harvester:#{harvester_uuid}, Change:#{crop_change_uuid} crop_number: #{crop_number}, key: #{primary_key}, transaction_type: #{transaction_type})"
+      @log.debug "HashQueue: Now: #{DateTime.now}, Harvester:#{harvester_uuid}, Change:#{change_uuid} crop_number: #{crop_number}, key: #{primary_key}, transaction_type: #{transaction_type})"
 
     end
 

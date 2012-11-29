@@ -76,8 +76,8 @@ module BarnyardHarvester
 
         # We got delete
         begin
-          crop_change_uuid = @uuid.generate
-          @my_delete_queue.push @harvester_uuid, crop_change_uuid, @crop_number, primary_key, BarnyardHarvester::DELETE, value
+          change_uuid = @uuid.generate
+          @my_delete_queue.push @harvester_uuid, change_uuid, @crop_number, primary_key, BarnyardHarvester::DELETE, value
         rescue Exception => e
           @log.fatal "FATAL error pushing delete #{primary_key} to queue. #{e}"
           exit 1
@@ -99,7 +99,7 @@ module BarnyardHarvester
 
       @source_count += 1
 
-      crop_change_uuid = @uuid.generate
+      change_uuid = @uuid.generate
 
       @key_store[primary_key] = :present # TODO What did this do: if @call_back.nil?
 
@@ -114,7 +114,7 @@ module BarnyardHarvester
         if @my_barn[primary_key] != Crack::JSON.parse(value.to_json)
           #We got change!
           begin
-            @my_change_queue.push(@harvester_uuid, crop_change_uuid, @crop_number, primary_key, BarnyardHarvester::CHANGE, value, @my_barn[primary_key])
+            @my_change_queue.push(@harvester_uuid, change_uuid, @crop_number, primary_key, BarnyardHarvester::CHANGE, value, @my_barn[primary_key])
           rescue Exception => e
             @log.fatal "FATAL error pushing change #{primary_key} to queue. #{e}"
             exit 1
@@ -126,7 +126,7 @@ module BarnyardHarvester
       else
         # We got add!
         #begin
-          @my_add_queue.push(@harvester_uuid, crop_change_uuid, @crop_number, primary_key, BarnyardHarvester::ADD, value)
+          @my_add_queue.push(@harvester_uuid, change_uuid, @crop_number, primary_key, BarnyardHarvester::ADD, value)
         #rescue Exception => e
         #  @log.fatal "FATAL error pushing add #{primary_key} to queue. #{e}"
         #  exit 1

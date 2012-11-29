@@ -18,9 +18,9 @@ module BarnyardHarvester
   class Queue
 
     class Enqueue
-      def initialize(queue, queued_at, harvester_uuid, crop_change_uuid, crop_number, primary_key, transaction_type, value, old_value)
-        Resque.enqueue(queue, queued_at, harvester_uuid, crop_change_uuid, crop_number, primary_key, transaction_type, value, old_value)
-        Resque.enqueue(ChangeLogs, queued_at, harvester_uuid, crop_change_uuid, crop_number, primary_key, transaction_type, value, old_value)
+      def initialize(queue, queued_at, harvester_uuid, change_uuid, crop_number, primary_key, transaction_type, value, old_value)
+        Resque.enqueue(queue, queued_at, harvester_uuid, change_uuid, crop_number, primary_key, transaction_type, value, old_value)
+        Resque.enqueue(ChangeLogs, queued_at, harvester_uuid, change_uuid, crop_number, primary_key, transaction_type, value, old_value)
       end
     end
 
@@ -54,12 +54,12 @@ module BarnyardHarvester
     end
 
 
-    def push(harvester_uuid, crop_change_uuid, crop_number, primary_key, transaction_type, value, old_value=Hash.new)
+    def push(harvester_uuid, change_uuid, crop_number, primary_key, transaction_type, value, old_value=Hash.new)
       check_key primary_key
 
-      Enqueue.new(@resque_queue, DateTime.now, harvester_uuid, crop_change_uuid, crop_number, primary_key, transaction_type, value.to_json, old_value.to_json)
+      Enqueue.new(@resque_queue, DateTime.now, harvester_uuid, change_uuid, crop_number, primary_key, transaction_type, value.to_json, old_value.to_json)
 
-      message = "RedisQueue: #{@resque_queue}, Now: #{DateTime.now}, Harvester:#{harvester_uuid}, Change:#{crop_change_uuid} crop_number: #{crop_number}, key: #{primary_key}, transaction_type: #{transaction_type})"
+      message = "RedisQueue: #{@resque_queue}, Now: #{DateTime.now}, Harvester:#{harvester_uuid}, Change:#{change_uuid} crop_number: #{crop_number}, key: #{primary_key}, transaction_type: #{transaction_type})"
 
       if @log.level == Logger::DEBUG
         message += ", value: #{value.to_json}, old_value: #{old_value.to_json}"

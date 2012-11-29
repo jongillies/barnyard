@@ -4,7 +4,7 @@ require "logger"
 require "json"
 require "aws-sdk"
 
-CROP_NUMBER = 1
+CROP_NUMBER = 10
 
 DEFAULT_DYNAMODB_SETTINGS = {
     :dynamo_db_endpoint => "dynamodb.us-west-1.amazonaws.com",
@@ -57,6 +57,8 @@ describe BarnyardHarvester do
       table = db.tables[table_name]
       table.hash_key = [:id, :string]
     end
+
+    # TODO AWS::SQS::Errors::QueueDeletedRecently wait 60 seconds and retry
     table
   end
 

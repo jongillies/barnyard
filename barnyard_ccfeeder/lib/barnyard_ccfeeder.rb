@@ -191,13 +191,25 @@ module BarnyardCcfeeder
 
     end
 
+    def get_subscriber(subscriber_id)
+      # I don't like this, but I will fix it later...
+      subscribers.each do |s|
+        return s if subscriber_id == s["id"]
+      end
+      nil
+    end
+
+    # Note that just function must return the subscription id...
     def has_subscribers(crop_number)
       subscribed = Array.new
-      subscribers.each do |id,data|
-        data["id"] = id
-        subscribed << data if subscribed?(id, crop_number)
+
+      subscriptions.each do |id, data|
+
+        if data["crop"]["crop_number"] == crop_number
+          subscribed << data
+        end
+        subscribed
       end
-      subscribed
     end
 
     # a "change" is detected by the harvester

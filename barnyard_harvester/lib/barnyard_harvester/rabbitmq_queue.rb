@@ -9,12 +9,12 @@ module BarnyardHarvester
 
   class Queue
 
-    def enqueue(queue, queued_at, harvester_uuid, crop_change_uuid, crop_number, primary_key, transaction_type, value, old_value)
+    def enqueue(queue, queued_at, harvester_uuid, change_uuid, crop_number, primary_key, transaction_type, value, old_value)
 
       payload = Hash.new
       payload[:queued_at] = queued_at
       payload[:harvester_uuid] = harvester_uuid
-      payload[:crop_change_uuid] = crop_change_uuid
+      payload[:change_uuid] = change_uuid
       payload[:crop_number] = crop_number
       payload[:primary_key] = primary_key
       payload[:transaction_type] = transaction_type
@@ -59,12 +59,12 @@ module BarnyardHarvester
 
     end
 
-    def push(harvester_uuid, crop_change_uuid, crop_number, primary_key, transaction_type, value, old_value=Hash.new)
+    def push(harvester_uuid, change_uuid, crop_number, primary_key, transaction_type, value, old_value=Hash.new)
       check_key primary_key
 
-      enqueue(QUEUE_FARMER, DateTime.now, harvester_uuid, crop_change_uuid, crop_number, primary_key, transaction_type, value.to_json, old_value.to_json)
+      enqueue(QUEUE_FARMER, DateTime.now, harvester_uuid, change_uuid, crop_number, primary_key, transaction_type, value.to_json, old_value.to_json)
 
-      message = "RabbitQueue: #{QUEUE_FARMER}, Now: #{DateTime.now}, Harvester:#{harvester_uuid}, Change:#{crop_change_uuid} crop_number: #{crop_number}, key: #{primary_key}, transaction_type: #{transaction_type})"
+      message = "RabbitQueue: #{QUEUE_FARMER}, Now: #{DateTime.now}, Harvester:#{harvester_uuid}, Change:#{change_uuid} crop_number: #{crop_number}, key: #{primary_key}, transaction_type: #{transaction_type})"
 
       if @log.level == Logger::DEBUG
         message += ", value: #{value.to_json}, old_value: #{old_value.to_json}"
