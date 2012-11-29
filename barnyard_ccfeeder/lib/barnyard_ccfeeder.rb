@@ -3,6 +3,7 @@ require "yaml"
 require "logger"
 require "rest-client"
 require "crack"
+require "json"
 
 module BarnyardCcfeeder
   YAML::ENGINE.yamler = 'syck'
@@ -234,10 +235,11 @@ module BarnyardCcfeeder
     end
 
     # a "transaction" is sent to a subscriber by the farmer based on the "change"
-    def push_transaction(subscription_id, queued_at, change_uuid, transaction_uuid, crop_number, primary_key, transaction_type, value, old_value)
+    def push_transaction(subscription_id, queued_at, change_uuid, transaction_uuid)
 
       data = Hash.new
 
+      data['subscription_id'] = subscription_id
       data['queue_time'] = queued_at
       data['change_uuid'] = change_uuid
       data['uuid'] = transaction_uuid
