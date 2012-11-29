@@ -1,6 +1,4 @@
 require "barnyard_logger/version"
-
-require "barnyard_logger/version"
 require "barnyard_ccfeeder"
 require "barnyard_harvester"
 require "crack"
@@ -82,7 +80,7 @@ module BarnyardLogger
 
     def process_transactions
 
-      while (msg = @changes_queue.receive_message) do
+      while (msg = @transaction_queue.receive_message) do
 
         payload = Crack::JSON.parse(msg.body)
 
