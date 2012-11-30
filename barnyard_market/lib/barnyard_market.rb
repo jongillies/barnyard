@@ -44,11 +44,7 @@ module BarnyardMarket
 
           subscribed.each do |subscription_id, subscription|
 
-            #puts "Subscription ID: #{id}"
-            #puts "Subscriber   ID: #{subscription["subscriber"]["id"]}"
-            #puts "Crop Number    : #{subscription["crop"]["id"]}"
-
-            queue_name = "barnyard-transactions-subscriber-#{subscription["subscriber"]["id"]}-crop-#{subscription["crop"]["id"]}"
+            queue_name = "barnyard-transactions-subscriber-#{subscription["subscriber"]["id"]}-crop-#{subscription["crop"]["crop_number"]}"
             queue = @sqs.queues.create(queue_name)
 
             payload["subscription_id"] = subscription_id
