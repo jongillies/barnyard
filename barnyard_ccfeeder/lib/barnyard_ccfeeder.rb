@@ -205,7 +205,7 @@ module BarnyardCcfeeder
 
       subscriptions.each do |id, data|
 
-        if data["crop"]["crop_number"] == crop_number
+        if data["crop"]["crop_number"].to_i == crop_number.to_i
           subscribed << data
         end
       end

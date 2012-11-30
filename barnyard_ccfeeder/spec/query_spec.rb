@@ -7,8 +7,8 @@ describe "this" do
 
     crop_number = 10
 
-    #url = "https://cachecow.c.qaapollogrp.edu"
-    url = "http://localhost:3000"
+    url = "https://cachecow.c.qaapollogrp.edu"
+    #url = "http://localhost:3000"
 
     cc = BarnyardCcfeeder::CacheCow.new :url => url
 

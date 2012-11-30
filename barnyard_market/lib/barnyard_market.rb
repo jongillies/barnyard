@@ -31,40 +31,41 @@ module BarnyardMarket
 
     def deliver_subscriptions
 
+      count = 0
+
       while (msg = @farmer_queue.receive_message) do
 
-#        begin
-          payload = Crack::JSON.parse(msg.body)
+        count += 1
 
-          @log.info "Received #{payload["transaction_type"].upcase} for crop #{payload["crop_number"]}"
+        payload = Crack::JSON.parse(msg.body)
 
-          subscribed = @cachecow.has_subscribers(payload["crop_number"])
+        @log.info "#{count} Received #{payload["transaction_type"].upcase} for crop #{payload["crop_number"]}"
 
-          @log.info "#{subscribed.count} subscriptions for crop #{payload["crop_number"]}"
+        subscribed = @cachecow.has_subscribers(payload["crop_number"])
 
-          subscribed.each do |subscription|
+        @log.info "#{subscribed.count} subscriptions for crop #{payload["crop_number"]}"
 
-            queue_name = "barnyard-transactions-subscriber-#{subscription["subscriber"]["id"]}-crop-#{subscription["crop"]["crop_number"]}"
-            queue = @sqs.queues.create(queue_name)
+        subscribed.each do |subscription|
 
-            payload["subscription_id"] = subscription["id"]
-            payload["transaction_uuid"] = UUID.new.generate
+          queue_name = "barnyard-transactions-subscriber-#{subscription["subscriber"]["id"]}-crop-#{subscription["crop"]["crop_number"]}"
+          queue = @sqs.queues.create(queue_name)
 
-            @log.info "Sending message for change #{payload["change_uuid"]} to queue #{queue_name}"
-            json_payload = payload.to_json
-            queue.send_message(json_payload)
-            @transaction_queue.send_message(json_payload)
-          end
+          payload["subscription_id"] = subscription["id"]
+          payload["transaction_uuid"] = UUID.new.generate
 
-          msg.delete
+          @log.info "Sending message for change #{payload["change_uuid"]} to queue #{queue_name}"
+          json_payload = payload.to_json
+          queue.send_message(json_payload)
+          @transaction_queue.send_message(json_payload)
+        end
 
-#        rescue e
-#          $stderr.puts e
-#        end
+        msg.delete
 
       end
 
     end
+
   end
+
 end
 
