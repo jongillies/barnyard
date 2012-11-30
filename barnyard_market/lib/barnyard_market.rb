@@ -42,15 +42,15 @@ module BarnyardMarket
 
           @log.info "#{subscribed.count} subscriptions for crop #{payload["crop_number"]}"
 
-          subscribed.each do |subscription_id, subscription|
+          subscribed.each do |subscription|
 
             queue_name = "barnyard-transactions-subscriber-#{subscription["subscriber"]["id"]}-crop-#{subscription["crop"]["crop_number"]}"
             queue = @sqs.queues.create(queue_name)
 
-            payload["subscription_id"] = subscription_id
+            payload["subscription_id"] = subscription["id"]
             payload["transaction_uuid"] = UUID.new.generate
 
-            @log.info "Sending message to queue #{queue_name}"
+            @log.info "Sending message for change #{payload["change_uuid"]} to queue #{queue_name}"
             json_payload = payload.to_json
             queue.send_message(json_payload)
             @transaction_queue.send_message(json_payload)

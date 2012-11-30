@@ -208,8 +208,8 @@ module BarnyardCcfeeder
         if data["crop"]["crop_number"] == crop_number
           subscribed << data
         end
-        subscribed
       end
+      subscribed
     end
 
     # a "change" is detected by the harvester

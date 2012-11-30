@@ -14,11 +14,11 @@ describe "this" do
 
     subs = cc.has_subscribers(crop_number)
 
-    subs.each do |id, subscription|
+    subs.each do |subscription|
 
-      puts "Subscription ID: #{id}"
+      puts "Subscription ID: #{subscription["id"]}"
       puts "Subscriber   ID: #{subscription["subscriber"]["id"]}"
-      puts "Crop Number    : #{subscription["crop"]["id"]}"
+      puts "Crop Number    : #{subscription["crop"]["crop_number"]}"
 
     end
 
