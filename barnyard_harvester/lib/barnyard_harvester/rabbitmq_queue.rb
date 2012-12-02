@@ -23,8 +23,8 @@ module BarnyardHarvester
 
       json_payload = payload
 
-      @direct_exchange.publish(json_payload, key: queue)
-      @direct_exchange.publish(json_payload, key: QUEUE_CHANGE)
+      @exchange.publish(json_payload, key: queue)
+      @exchange.publish(json_payload, key: QUEUE_CHANGE)
 
     end
 
@@ -41,7 +41,7 @@ module BarnyardHarvester
       payload[:add_count] = add_count
       payload[:delete_count] = delete_count
 
-      @direct_exchange.publish(payload.to_json, key: QUEUE_HARVESTER)
+      @exchange.publish(payload.to_json, key: QUEUE_HARVESTER)
 
     end
 
@@ -52,10 +52,11 @@ module BarnyardHarvester
       @crop_number = args.fetch(:crop_number) { raise "You must provide :crop_number" }
       @rabbitmq_settings = args.fetch(:rabbitmq_settings) { raise "You must provide :rabbitmq_settings" }
 
+      @rabbitmq_settings[:logging] = true if @debug
+
       @bunny = Bunny.new(@rabbitmq_settings)
       @bunny.start
-
-      @direct_exchange = @bunny.exchange('');
+      @exchange = @bunny.exchange("")
 
     end
 

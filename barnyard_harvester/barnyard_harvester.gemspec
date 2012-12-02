@@ -27,6 +27,7 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency "bson_ext", "= 1.6.0"
   gem.add_runtime_dependency "mongo", "= 1.6.0"
   gem.add_runtime_dependency "amqp"
+  gem.add_runtime_dependency "bunny"
   gem.add_runtime_dependency "aws-sdk"
 
 end
