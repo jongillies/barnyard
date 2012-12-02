@@ -23,8 +23,10 @@ module BarnyardHarvester
 
       json_payload = payload
 
-      @exchange.publish(json_payload, key: queue)
-      @exchange.publish(json_payload, key: QUEUE_CHANGE)
+      @bunny.queue(queue).publish(json_payload)
+      @bunny.queue(QUEUE_CHANGE).publish(json_payload)
+      #@exchange.publish(json_payload, key: queue)
+      #@exchange.publish(json_payload, key: QUEUE_CHANGE)
 
     end
 
@@ -41,7 +43,9 @@ module BarnyardHarvester
       payload[:add_count] = add_count
       payload[:delete_count] = delete_count
 
-      @exchange.publish(payload.to_json, key: QUEUE_HARVESTER)
+      @bunny.queue(QUEUE_HARVESTER).publish(payload.to_json)
+
+      # @exchange.publish(payload.to_json, key: QUEUE_HARVESTER)
 
     end
 
@@ -56,7 +60,7 @@ module BarnyardHarvester
 
       @bunny = Bunny.new(@rabbitmq_settings)
       @bunny.start
-      @exchange = @bunny.exchange("")
+      #@exchange = @bunny.exchange("")
 
     end
 
