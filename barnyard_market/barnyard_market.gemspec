@@ -24,6 +24,7 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency "barnyard_harvester"
   gem.add_runtime_dependency "crack"
   gem.add_runtime_dependency "uuid"
+  gem.add_runtime_dependency "bunny"
 
 
 end
