@@ -8,59 +8,6 @@ require "json"
 require "bunny"
 
 module BarnyardMarket
-  class Queue
-
-    def initialize(args)
-      @queueing = args.fetch(:queueing) { raise "You must provide :queueing" }
-
-      case @queueing
-        when :sqs
-          @sqs_settings = args.fetch(:sqs_settings) { raise "You must provide :sqs_settings" }
-          @sqs = AWS::SQS.new(@sqs_settings)
-        when :rabbitmq
-          @rabbitmq_settings = args.fetch(:rabbitmq_settings) { raise "You must provide :rabbitmq_settings" }
-          @rabbitmq_settings[:logging] = true if @debug
-          @bunny = Bunny.new(@rabbitmq_settings)
-          @bunny.start
-        else
-          raise "Unknown queueing method."
-      end
-
-    end
-
-    def send(name, message)
-      case @queueing
-        when :sqs
-          queue = @sqs.queues.create(name)
-          queue.send_message(message)
-        when :rabbitmq
-          @bunny.queue(name).publish(message)
-      end
-    end
-
-    def get(name)
-      case @queueing
-        when :sqs
-          @sqs.queues.create(name).receive_message
-        when :rabbitmq
-          msg = @bunny.queue(name).pop[:payload]
-          if msg == :queue_empty
-            return nil
-          else
-            msg
-          end
-      end
-    end
-
-    def delete(msg)
-      case @queueing
-        when :sqs
-          msg.delete
-      end
-
-    end
-
-  end
 
   class ProcessSubscriptions
 
@@ -73,7 +20,7 @@ module BarnyardMarket
 
       @cachecow = BarnyardCcfeeder::CacheCow.new(@cachecow_settings)
 
-      @q = Queue.new(args)
+      @q = BarnyardHarvester::GenericQueue.new(args)
 
       deliver_subscriptions
     end
@@ -82,7 +29,8 @@ module BarnyardMarket
 
       count = 0
 
-      while (msg = @q.get("barnyard-farmer")) do
+
+      while (msg = @q.pop("barnyard-farmer")) do
 
         count += 1
 
@@ -104,12 +52,10 @@ module BarnyardMarket
           @log.info "Sending message for change #{payload["change_uuid"]} to queue #{queue_name}"
           json_payload = payload.to_json
 
-          @q.send(queue_name, json_payload)
-          @q.send("barnyard-transaction", json_payload)
+          @q.push(queue_name, json_payload)
+          @q.push("barnyard-transaction", json_payload)
 
         end
-
-        @q.delete(msg)
 
       end
 

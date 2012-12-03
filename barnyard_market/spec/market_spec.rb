@@ -1,18 +1,6 @@
 require "rspec"
 require "barnyard_market"
 
-#DYNAMODB_SETTINGS = {
-#    :dynamo_db_endpoint => "dynamodb.us-west-1.amazonaws.com",
-#    :access_key_id => ENV["AWS_ACCESS_KEY_ID"],
-#    :secret_access_key => ENV["AWS_SECRET_ACCESS_KEY"]
-#}
-#
-#SQS_SETTINGS = {
-#    :sqs_endpoint => "sqs.us-west-1.amazonaws.com",
-#    :access_key_id => ENV["AWS_ACCESS_KEY_ID"],
-#    :secret_access_key => ENV["AWS_SECRET_ACCESS_KEY"]
-#}
-
 ["BACKEND_AWS_SECRET_ACCESS_KEY",
  "BACKEND_AWS_ACCESS_KEY_ID",
  "BACKEND_AWS_REGION",
@@ -36,7 +24,6 @@ SQS_SETTINGS = {
     :secret_access_key => BACKEND_AWS_SECRET_ACCESS_KEY
 }
 
-
 REDIS_SETTINGS = {
     :host => "localhost",
     :port => 6379,
@@ -52,9 +39,9 @@ CACHECOW_SETTINGS = {
     :url => "https://cachecow.c.qaapollogrp.edu"
 }
 
-describe "i should" do
+describe "Distributor" do
 
-  it "should work" do
+  it "should empty the RabbitMQ Farmer" do
 
     my_logger = Logger.new(STDOUT)
     my_logger.level = Logger::DEBUG
@@ -63,19 +50,23 @@ describe "i should" do
                                                  :rabbitmq_settings => RABBITMQ_SETTINGS,
                                                  :backend => :redis,
                                                  :debug => true,
+                                                 :cachecow_settings => CACHECOW_SETTINGS,
+                                                 :logger => my_logger)
+
+  end
+
+  it "should empty the SQS Farmer" do
+
+    my_logger = Logger.new(STDOUT)
+    my_logger.level = Logger::DEBUG
+
+    h = BarnyardMarket::ProcessSubscriptions.new(:queueing => :sqs,
+                                                 :sqs_settings => SQS_SETTINGS,
+                                                 :backend => :redis,
+                                                 :debug => true,
                                                  :redis_settings => REDIS_SETTINGS,
                                                  :cachecow_settings => CACHECOW_SETTINGS,
                                                  :logger => my_logger)
-    #h = BarnyardMarket::ProcessSubscriptions.new(:queueing => :sqs,
-    #                                             :sqs_settings => SQS_SETTINGS,
-    #                                             :backend => :dynamodb,
-    #                                             :debug => true,
-    #                                             :dynamodb_settings => DYNAMODB_SETTINGS,
-    #                                             :cachecow_settings => CACHECOW_SETTINGS,
-    #                                             :logger => my_logger)
-
-
-    #To change this template use File | Settings | File Templates.
-    true.should == true
   end
+
 end
