@@ -1,6 +1,7 @@
-module BarnyardHarvester
 
-  require "aws-sdk"
+require "barnyard_harvester/generic_queue"
+
+module BarnyardHarvester
 
   QUEUE_FARMER = "barnyard-farmer"
   QUEUE_HARVESTER = "barnyard-harvests"
@@ -9,10 +10,10 @@ module BarnyardHarvester
 
   class Queue
 
-    def enqueue(queued_at, harvester_uuid, change_uuid, crop_number, primary_key, transaction_type, value, old_value)
+    def enqueue(queue, harvester_uuid, change_uuid, crop_number, primary_key, transaction_type, value, old_value)
 
       payload = Hash.new
-      payload[:queued_at] = queued_at
+      payload[:queued_at] = Time.now
       payload[:harvester_uuid] = harvester_uuid
       payload[:change_uuid] = change_uuid
       payload[:crop_number] = crop_number
@@ -23,13 +24,8 @@ module BarnyardHarvester
 
       json_payload = payload.to_json
 
-      @log.debug "Starting send_message to farmer..."
-      @farmer_queue.send_message(json_payload)
-      @log.debug "Done send_message to farmer..."
-
-      @log.debug "Starting send_message to changes..."
-      @change_queue.send_message(json_payload)
-      @log.debug "Done send_message to changes..."
+      @q.push(queue,json_payload)
+      @q.push(QUEUE_CHANGE,json_payload)
 
     end
 
@@ -46,7 +42,7 @@ module BarnyardHarvester
       payload[:add_count] = add_count
       payload[:delete_count] = delete_count
 
-      @harvester_queue.send_message(payload.to_json)
+      @q.push(QUEUE_HARVESTER,payload.to_json)
 
     end
 
@@ -55,22 +51,17 @@ module BarnyardHarvester
       @debug = args.fetch(:debug) { false }
       @log = args.fetch(:logger) { Logger.new(STDOUT) }
       @crop_number = args.fetch(:crop_number) { raise "You must provide :crop_number" }
-      @sqs_settings = args.fetch(:sqs_settings) { raise "You must provide :sqs_settings" }
 
-      @sqs = AWS::SQS.new(@sqs_settings)
-
-      @farmer_queue = @sqs.queues.create(QUEUE_FARMER)
-      @harvester_queue = @sqs.queues.create(QUEUE_HARVESTER)
-      @change_queue = @sqs.queues.create(QUEUE_CHANGE)
+      @q = BarnyardHarvester::GenericQueue.new(args)
 
     end
 
     def push(harvester_uuid, change_uuid, crop_number, primary_key, transaction_type, value, old_value=Hash.new)
       check_key primary_key
 
-      enqueue(DateTime.now, harvester_uuid, change_uuid, crop_number, primary_key, transaction_type, value.to_json, old_value.to_json)
+      enqueue(QUEUE_FARMER, harvester_uuid, change_uuid, crop_number, primary_key, transaction_type, value.to_json, old_value.to_json)
 
-      message = "SQS: #{QUEUE_FARMER}, Now: #{DateTime.now}, Harvester:#{harvester_uuid}, Change:#{change_uuid} crop_number: #{crop_number}, key: #{primary_key}, transaction_type: #{transaction_type})"
+      message = "RabbitQueue: #{QUEUE_FARMER}, Now: #{DateTime.now}, Harvester:#{harvester_uuid}, Change:#{change_uuid} crop_number: #{crop_number}, key: #{primary_key}, transaction_type: #{transaction_type})"
 
       if @log.level == Logger::DEBUG
         message += ", value: #{value.to_json}, old_value: #{old_value.to_json}"

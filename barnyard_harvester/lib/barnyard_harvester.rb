@@ -2,6 +2,7 @@ require "uuid"
 require "logger"
 
 require "barnyard_harvester/version"
+require "barnyard_harvester/queue"
 
 module BarnyardHarvester
 
@@ -20,21 +21,24 @@ module BarnyardHarvester
 
     def initialize(args)
 
+      @queueing = args.fetch(:queueing) { raise "You must provide :queueing" }
       @crop_number = args.fetch(:crop_number) { raise "You must provide :crop_number" }
       @redis_settings = args.fetch(:redis_settings) { DEFAULT_REDIS_SETTINGS }
       @debug = args.fetch(:debug) { false }
       @log = args.fetch(:logger) { Logger.new(STDOUT) }
 
-      @queueing = args[:queueing]
+      @q = BarnyardHarvester::Queue.new(args)
 
-      case @queueing
-        when :rabbitmq
-          @rabbitmq_settings = args.fetch(:rabbitmq_settings) { raise "You must provide :rabbitmq_settings" }
-        when :sqs
-          @sqs_settings = args.fetch(:sqs_settings) { raise "You must provide :sqs_settings" }
-        else
-          @queueing = :resque
-      end
+      #@queueing = args[:queueing]
+      #
+      #case @queueing
+      #  when :rabbitmq
+      #    @rabbitmq_settings = args.fetch(:rabbitmq_settings) { raise "You must provide :rabbitmq_settings" }
+      #  when :sqs
+      #    @sqs_settings = args.fetch(:sqs_settings) { raise "You must provide :sqs_settings" }
+      #  else
+      #    @queueing = :resque
+      #end
 
       @backend = args.fetch(:backend) { :redis }
 
@@ -43,7 +47,7 @@ module BarnyardHarvester
       end
 
       require "barnyard_harvester/#{@backend.to_s}_helper" if File.exist? "barnyard_harvester/#{@backend.to_s}_helper"
-      require "barnyard_harvester/#{@queueing.to_s}_queue"
+#      require "barnyard_harvester/#{@queueing.to_s}_queue"
       require "barnyard_harvester/#{@backend.to_s}"
 
 #      YAML::ENGINE.yamler = 'syck'

@@ -22,7 +22,7 @@ describe BarnyardHarvester do
     my_logger = Logger.new(STDOUT)
     my_logger.level = Logger::INFO
 
-    h = BarnyardHarvester::Sync.new(:queueing => :resque,
+    h = BarnyardHarvester::Sync.new(:queueing => :hash,
                                     :backend => backend,
                                     :debug => false,
                                     :crop_number => 1,

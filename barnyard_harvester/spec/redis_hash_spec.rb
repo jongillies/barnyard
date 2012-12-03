@@ -21,7 +21,7 @@ describe BarnyardHarvester do
     my_logger = Logger.new(STDOUT)
     my_logger.level = Logger::INFO
 
-    h = BarnyardHarvester::Sync.new(:backend => backend, :debug => false, :crop_number => CROP_NUMBER, :redis_settings => REDIS_SETTINGS, :logger => my_logger)
+    h = BarnyardHarvester::Sync.new(:queueing => :hash, :backend => backend, :debug => false, :crop_number => CROP_NUMBER, :redis_settings => REDIS_SETTINGS, :logger => my_logger)
 
     h.run do
       data.each do |primary_key, value|

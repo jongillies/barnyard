@@ -7,12 +7,6 @@ require "json"
 
 CROP_NUMBER = 1
 
-REDIS_SETTINGS = {
-    :host => "localhost",
-    :port => 6379,
-    :db => CROP_NUMBER
-}
-
 MONGODB_SETTINGS = {
     :host => "localhost",
     :collection => "test_collection",
@@ -21,12 +15,17 @@ MONGODB_SETTINGS = {
 }
 
 MONGODB_REPLICA_SET_SETTINGS = {
-    :host => ["ip-172-19-31-44.c.qaapollogrp.edu:27017", "ip-172-19-30-49.c.qaapollogrp.edu:27017", "ip-172-19-31-202.c.qaapollogrp.edu:27017"],
+    :host => ["mongo1:27017", "mongo2:27017", "mongo3:27017"],
     :collection => "test_collection",
     :db => "test_database",
-    :user => "honeybadger",
-    :password => "0joQuk35vJM05Hj",
+    :user => "username",
+    :password => "password",
     :collection => "test_collection"
+}
+
+RABBITMQ_SETTINGS = {
+    :host => "localhost"
+#    :port => 6163
 }
 
 $mongo_settings = MONGODB_SETTINGS
@@ -41,11 +40,11 @@ describe BarnyardHarvester do
     my_logger.level = Logger::INFO
 
     h = BarnyardHarvester::Sync.new(:backend => backend,
-                                    :queueing => :resque,
+                                    :queueing => :rabbitmq,
                                     :debug => false,
                                     :mongodb_settings => $mongo_settings,
                                     :crop_number => CROP_NUMBER,
-                                    :redis_settings => REDIS_SETTINGS,
+                                    :rabbitmq_settings => RABBITMQ_SETTINGS,
                                     :logger => my_logger)
 
     h.run do
@@ -125,8 +124,6 @@ describe BarnyardHarvester do
     h.source_count.should eq(data.count)
     h.cache_count.should eq(data.count)
 
-    h.my_barn.log_run("#{file}-#{Random.rand(100)}", @crop_number, Time.now, Time.now, h.source_count, h.change_count, h.add_count, h.delete_count)
-
   end
 
   it "test change one record" do
@@ -143,8 +140,6 @@ describe BarnyardHarvester do
     h.source_count.should eq(data.count)
     h.cache_count.should eq(data.count)
 
-    h.my_barn.log_run("#{file}-#{Random.rand(100)}", @crop_number, Time.now, Time.now, h.source_count, h.change_count, h.add_count, h.delete_count)
-
   end
 
   it "test delete one record" do
@@ -160,8 +155,6 @@ describe BarnyardHarvester do
     h.change_count.should eq(0)
     h.source_count.should eq(data.count)
     h.cache_count.should eq(data.count + 1)
-
-    h.my_barn.log_run("#{file}-#{Random.rand(100)}", @crop_number, Time.now, Time.now, h.source_count, h.change_count, h.add_count, h.delete_count)
 
   end
 
@@ -180,8 +173,6 @@ describe BarnyardHarvester do
     h.change_count.should eq(0)
     h.source_count.should eq(1)
     h.cache_count.should eq(init_data.count + 1)
-
-    h.my_barn.log_run("#{file}-#{Random.rand(100)}", @crop_number, Time.now, Time.now, h.source_count, h.change_count, h.add_count, h.delete_count)
 
   end
 
