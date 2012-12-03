@@ -30,7 +30,7 @@ module BarnyardMarket
       count = 0
 
 
-      while (msg = @q.pop("barnyard-farmer")) do
+      while (msg = @q.pop(BarnyardHarvester::QUEUE_FARMER)) do
 
         count += 1
 
@@ -44,7 +44,7 @@ module BarnyardMarket
 
         subscribed.each do |subscription|
 
-          queue_name = "barnyard-transactions-subscriber-#{subscription["subscriber"]["id"]}-crop-#{subscription["crop"]["crop_number"]}"
+          queue_name = "#{BarnyardHarvester::QUEUE_TRANSACTION}-subscriber-#{subscription["subscriber"]["id"]}-crop-#{subscription["crop"]["crop_number"]}"
 
           payload["subscription_id"] = subscription["id"]
           payload["transaction_uuid"] = UUID.new.generate
@@ -53,7 +53,7 @@ module BarnyardMarket
           json_payload = payload.to_json
 
           @q.push(queue_name, json_payload)
-          @q.push("barnyard-transaction", json_payload)
+          @q.push(BarnyardHarvester::QUEUE_TRANSACTION, json_payload)
 
         end
 

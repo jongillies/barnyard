@@ -22,27 +22,11 @@ module BarnyardLogger
 
       @q = BarnyardHarvester::GenericQueue.new(args)
 
-      #@debug = args.fetch(:debug) { false }
-      #@log = args.fetch(:logger) { Logger.new(STDOUT) }
-      #
-      #@sqs_settings = args.fetch(:sqs_settings) { raise "You must provide :sqs_settings" }
-      #@dynamodb_settings = args.fetch(:dynamodb_settings) { raise "You must provide :dynamodb_settings" }
-      #@cachecow_settings = args.fetch(:cachecow_settings) { raise "You must provide :cachecow_settings" }
-      #
-      #@cachecow = BarnyardCcfeeder::CacheCow.new(@cachecow_settings)
-      #
-      #@sqs = AWS::SQS.new(@sqs_settings)
-      #
-      #@changes_queue = @sqs.queues.create("barnyard-changes")
-      #@transaction_queue = @sqs.queues.create("barnyard-transactions")
-      #@harvests_queue = @sqs.queues.create("barnyard-harvests")
-
     end
-
 
     def process_harvests
 
-      while (msg = @q.pop("barnyard-harvests")) do
+      while (msg = @q.pop(BarnyardHarvester::QUEUE_HARVESTER)) do
 
         payload = Crack::JSON.parse(msg)
 
@@ -66,7 +50,7 @@ module BarnyardLogger
 
     def process_changes
 
-      while (msg = @q.pop("barnyard-changes")) do
+      while (msg = @q.pop(BarnyardHarvester::QUEUE_CHANGE)) do
 
         payload = Crack::JSON.parse(msg)
 
@@ -89,7 +73,7 @@ module BarnyardLogger
 
     def process_transactions
 
-      while (msg = @q.pop("barnyard-transactions")) do
+      while (msg = @q.pop(BarnyardHarvester::QUEUE_TRANSACTION)) do
 
         payload = Crack::JSON.parse(msg)
 
