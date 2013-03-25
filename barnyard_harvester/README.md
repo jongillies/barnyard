@@ -69,7 +69,7 @@ This tests the initilization and parameters:
 
 This tests the Redis backend of the harvester:
 
-    rspec -c spec/redis_spec.rb
+    rspec -c spec/redis_rabbitmq_spec.rb
     .....
 
     Finished in 0.27042 seconds
