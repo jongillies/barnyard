@@ -60,8 +60,13 @@ The following harvesters are provided "out of the box":
 
 ## How it works
 
-* Setup data sources using CacheCow
+* Setup data sources (crops) using CacheCow
 * Setup subscribers using CacheCow
 * Schedule/run your harvester for the data
 * Schedule/run your consumer for the data
+
+Some screeshots from CacheCow.  You will notice the nifty statistics:
+
+[Subscriptions(https://github.com/jongillies/cachecow/raw/master/img/change.png)]
+
 
