@@ -67,6 +67,16 @@ The following harvesters are provided "out of the box":
 
 Some screeshots from CacheCow.  You will notice the nifty statistics:
 
-![Subscriptions](https://raw.github.com/jongillies/cachecow/master/img/change.png)
+Crops
+![Crops](https://raw.github.com/jongillies/cachecow/master/img/crops.png)
+
+Changes
+![Change](https://raw.github.com/jongillies/cachecow/master/img/change.png)
+
+Subscriptions
+![Subscriptions](https://raw.github.com/jongillies/cachecow/master/img/subscriptions.png)
+
+Queues
+![queues](https://raw.github.com/jongillies/cachecow/master/img/queues.png)
 
 
